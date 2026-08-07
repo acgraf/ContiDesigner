@@ -142,6 +142,5 @@ MIT - see `license`
 
 ## Author
 
-Andrea Caroline Graf
-
-andrea.caroline.graf@univie.ac.at(mailto:andrea.caroline.graf@univie.ac.at)
+Andrea Caroline Graf 
+(mailto:andrea.caroline.graf@univie.ac.at)
