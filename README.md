@@ -24,7 +24,7 @@ ContiDesigner can be used in three ways:
   Interactive exploration with your own implementations
 
 - **Hosted web tool**  
-  Available at: `https://chemnettools.anc.univie.ac.at/ContiDesigner/` (no installation required)
+  Available at: [https://chemnettools.anc.univie.ac.at/ContiDesigner/] (no installation required)
 
 
 ## Features
@@ -82,24 +82,30 @@ Access the hosted version: [https://chemnettools.anc.univie.ac.at/ContiDesigner/
 
 This is the easiest way to explore the tool without setup.
 
+
 ## Project Structure
-app/ Dash application and UI logic
-dash_app.py Main app entry point
-conti_reactions.py Reaction definitions (not that important, only needed for the sbml export)
-export_sbml.py SBML export
-layout/ UI components
-assets/ Static assets (this is only one png i need for the app)
+ContiDesigner/
+├── app/ # Dash application and UI logic
+│ ├── dash_app.py # Main app entry point
+│ ├── conti_reactions.py # Reaction definitions used for SBML export
+│ ├── export_sbml.py # SBML export functionality
+│ ├── layout/ # UI components
+│ └── assets/ # Static assets 
+│
+├── src/
+│ └── ContiDesigner/ # Core installable Python package
+│ ├── core/ # Models, solvers, equations
+│ ├── plot/ # Plotting utilities
+│ └── utils/ # Helper functions
+│
+├── case_studies/ # Reproducible examples
+│ ├── lactic_acid/ # Lactic acid system
+│ └── PHB/ # PHB system
 
-src/ContiDesigner/ Core package (installable)
-core/ Models and solvers
-plot/ Plotting utilities
-utils/ Helpers
-
-case_studies/ Reproducible examples
-LA/ Lactic acid system
-PHB/ PHB system
-
-in misc/ are the figures i create for publication - is this needed?
+├── paper/ # Plots for the paper (graphical abstract)
+│
+│
+└── README.md
 
 ## Typical Workflow
 
@@ -107,7 +113,7 @@ in misc/ are the figures i create for publication - is this needed?
    - Growth: \( \mu_{max} \), Monod constant  
    - Production: Luedeking–Piret coefficients  
    - Maintenance rate  
-   - Yields: \( Y_{XS}, Y_{PS}, Y_{AS} \)  
+   - Yields: \( Y^{XS}, Y^{PS}, Y^{AS} \)  
    - Process: total volume, feed concentrations, feed split  
 
 2. Run simulations or optimizations via:
@@ -124,7 +130,7 @@ in misc/ are the figures i create for publication - is this needed?
 - Stage 2: substrate demand is determined by maintenance, production, and optional growth  
 
 Process structure:
-- Two-stage cascade: Stage 1 → Stage 2  
+- Two-stage cascade
 - Separate feed streams possible for both stages  
 
 The equivalent one-stage process:
@@ -132,6 +138,7 @@ The equivalent one-stage process:
 - Combined feed equivalent to Stage 2 input  
 
 Key design variables:
+- Dilution rate
 - Volume split  
 - Feed split  
 
