@@ -78,7 +78,7 @@ The interface consists of:
 - Information panel
 ### Web app (hosted)
 
-Access the hosted version: `https://chemnettools.anc.univie.ac.at/ContiDesigner/`
+Access the hosted version: [https://chemnettools.anc.univie.ac.at/ContiDesigner/]
 
 This is the easiest way to explore the tool without setup.
 
@@ -141,4 +141,7 @@ Key design variables:
 MIT - see `license`
 
 ## Author
-tba
+
+Andrea Caroline Graf
+
+andrea.caroline.graf@univie.ac.at(mailto:andrea.caroline.graf@univie.ac.at)
