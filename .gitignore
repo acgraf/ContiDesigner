@@ -1,0 +1,9 @@
+__pycache__/
+.venv/
+test.py
+app_restart_instructions.txt
+dash_cache/
+*test.csv
+*.vscode/
+pi_tests/*
+test*
