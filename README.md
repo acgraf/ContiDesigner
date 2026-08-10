@@ -84,6 +84,7 @@ This is the easiest way to explore the tool without setup.
 
 
 ## Project Structure
+``` text
 ContiDesigner/
 ├── app/ # Dash application and UI logic
 │ ├── dash_app.py # Main app entry point
@@ -106,7 +107,7 @@ ContiDesigner/
 │
 │
 └── README.md
-
+```
 ## Typical Workflow
 
 1. Define process parameters:
