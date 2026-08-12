@@ -72,7 +72,11 @@ def stage1_jacobian_analytic(model, state):
         ds/dt = D1 (sf1 - s) - sigma x
         dp/dt = (pi1 mu + pi0) x - D1 p
     """
-    if model.is_substrate_inhibited or model.is_biomass_inhibited or model.is_product_inhibited:
+    if (
+        model.is_substrate_inhibited
+        or model.is_biomass_inhibited
+        or model.is_product_inhibited
+    ):
         raise ValueError(
             "analytic stage-1 Jacobian is only valid without inhibition; "
             "use the finite-difference route"
@@ -91,7 +95,7 @@ def stage1_jacobian_analytic(model, state):
     J[0, 2] = 0.0
 
     J[1, 0] = -sigma
-    J[1, 1] = -x1 * dsigma_ds - D1       # the -D1 dilution term
+    J[1, 1] = -x1 * dsigma_ds - D1  # the -D1 dilution term
     J[1, 2] = 0.0
 
     J[2, 0] = model.pi0_s1 + mu * model.pi1_s1
@@ -121,7 +125,7 @@ def stage2_jacobian_analytic(model, state):
     production = model.production(1, mu2, s2)
 
     J = np.zeros((3, 3))
-    J[0, 0] = mu2 - model.delta - D2       # mu_s2 now included
+    J[0, 0] = mu2 - model.delta - D2  # mu_s2 now included
     J[1, 0] = -sigma
     J[1, 1] = -D2
     J[2, 0] = production

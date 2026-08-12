@@ -157,8 +157,9 @@ def plot_contour(
             ),
             text=hover_text,
             hovertemplate=hovertemplate,
-            hoverinfo="x+y+text",
+            hoverinfo="skip",
             connectgaps=False,
+            hoverongaps=False,
             line=dict(width=0),
         )
     )
@@ -207,7 +208,7 @@ def plot_contour(
             hoverinfo="skip",
         )
     )
-
+    
     fig.update_layout(
         xaxis_title=label_x,
         yaxis_title=label_y,

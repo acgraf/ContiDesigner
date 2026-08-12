@@ -332,8 +332,12 @@ class Solver:
                     f"max_param must be one of {steady_states.columns.tolist()}"
                 )
             best = steady_states[max_param].max()
-            near_opt = steady_states[steady_states[max_param] >= best]
-            best_state = near_opt.iloc[0]
+            if not np.isfinite(best):
+                # no (phi, ny) pair is feasible at this D_total
+                return np.nan, np.nan, steady_states, np.nan
+            best_state = steady_states.loc[steady_states[max_param].idxmax()]
+            # near_opt = steady_states[steady_states[max_param] >= best]
+            # best_state = near_opt.iloc[0]
             phi_param_max = best_state["phi"]
             ny_param_max = best_state["ny"]
             optimal_process = best_state
@@ -359,6 +363,8 @@ class Solver:
                 phi_opt, ny_opt, phi_ny_grid, rel_improv = self.find_optimum_phi_ny(
                     max_D=D_val, max_param=max_param, secondary_param=secondary_param
                 )
+                if not (np.isfinite(phi_opt) and np.isfinite(ny_opt)):
+                    continue          # skip this D_total
                 # With optimal phi, ny, recompute steady states analytically
                 with self.model.temporary_params({"phi": phi_opt, "ny": ny_opt}):
                     steady_states = self.calculate_steady_states()
