@@ -63,7 +63,7 @@ class Solver:
             ny, phi = self.model.ny, self.model.phi
             mu_s2 = self.model.mu_s2
         else:
-            ny, phi = self.model.phis[i], self.model.nys[i]
+            phi, ny = self.model.phis[i], self.model.nys[i]
             mu_s2 = self.model.mu_s2[i - 1]
         D_total = self.model.D_total
         sf2_max = self.model.sf2_max
@@ -382,6 +382,8 @@ class Solver:
 
                     DX_onestage = self.calculate_STY(X_onestage, self.model.D_total)
                     D1X1 = self.calculate_STY(X1, self.model.D1)
+                    D1_opt = self.model.D1
+                    D2_opt = self.model.D2
 
                 results.append(
                     {
@@ -393,8 +395,8 @@ class Solver:
                         "STY_onestage": STY_onestage,
                         "phi_opt": phi_opt,
                         "ny_opt": ny_opt,
-                        "D1_opt": self.model.D1,
-                        "D2_opt": self.model.D2,
+                        "D1_opt": D1_opt,
+                        "D2_opt": D2_opt,
                         "X1_opt": X1,
                         "D1X1": D1X1,
                         "S1_opt": S1,
@@ -451,3 +453,15 @@ class Solver:
             S_out = self.model.F_total * ss_os
             S_consumed = S_in - S_out
         return S_consumed
+
+    def calculate_yield(self, p_out, s_out, cascade=True):
+        """Product yield on consumed substrate in g/g.
+
+        Product flow (P_out * F, g/h) divided by substrate consumption (g/h).
+        """
+        product_flow = p_out * self.model.F_total
+        if cascade:
+            s_consumed = self.total_substrate_consumed(ss2=s_out, cascade=True)
+        else:
+            s_consumed = self.total_substrate_consumed(ss_os=s_out, cascade=False)
+        return helpers.save_divide(product_flow, s_consumed)

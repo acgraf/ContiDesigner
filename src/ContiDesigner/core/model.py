@@ -489,8 +489,9 @@ class ContiModel:
         return D_max, D_values
 
     def dilution_range_D1(self, norm=False):
-        ## since D1 is always bigger than D_total
-        ## so it also needs to be limited
+        ## washout bound of stage 1 (a chemostat fed with sf1). Same value as
+        ## D_max, the washout bound of the one-stage reference, but a different
+        ## constraint: D1 = phi / (1 - ny) * D_total can be above or below D_total
         buffer = 0#0.15
         D_range = np.linspace(0, 1, 101)
         mu_eff = self.limit_rate(self.mu_max, [0, self.sf1, 0])
