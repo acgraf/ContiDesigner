@@ -120,11 +120,8 @@ def summarize_process(
     prod1 = solver.calculate_STY(pp, model.D_total)
     prod_cascade = solver.calculate_STY(pp2, model.D_total)
 
-    s_OS_consumed = solver.total_substrate_consumed(ss_os=ss, cascade=False)
-    s_TS_consumed = solver.total_substrate_consumed(ss2=ss2, cascade=True)
-    Yield_OS = pp / s_OS_consumed
-    Yield_TS = pp2 / s_TS_consumed
-
+    Yield_OS = solver.calculate_yield(pp, ss, cascade=False)
+    Yield_TS = solver.calculate_yield(pp2, ss2, cascade=True)
 
     card_header = dbc.CardHeader(
         [
@@ -227,7 +224,7 @@ def summarize_process(
                                 "Yield",
                                 Yield_OS,
                                 Yield_TS,
-                                unit="[g/g/h]",
+                                unit="[g/g]",
                                 tooltip=tooltips["yield"],
                                 row_id=f"{prefix}_yield",
                             ),
