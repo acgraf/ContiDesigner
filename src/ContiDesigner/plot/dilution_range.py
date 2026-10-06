@@ -10,7 +10,6 @@ def _plot_D_range_panel(
     X,
     S,
     P,
-    X1,
     X2,
     P2,
     STY,
@@ -35,7 +34,7 @@ def _plot_D_range_panel(
             mode="lines+markers",
             marker=dict(size=1, opacity=0),
             name="Biomass (One-stage)",
-            line=dict(color="blue"),
+            line=dict(color="blue", dash="dash"),
             yaxis="y",
             hovertemplate=(
                 "X<sub>OS</sub> = %{y:.2f} g/L " "<br>D = %{x:.2f} /h" "<extra></extra>"
@@ -50,7 +49,7 @@ def _plot_D_range_panel(
             mode="lines+markers",
             marker=dict(size=1, opacity=0),
             name="Product (One-stage)",
-            line=dict(color="orange"),
+            line=dict(color="orange", dash="dash"),
             yaxis="y",
             hovertemplate=(
                 "P<sub>OS</sub> = %{y:.2f} g/L" "<br>D = %{x:.2f} /h" "<extra></extra>"
@@ -64,7 +63,7 @@ def _plot_D_range_panel(
             y=STY,
             mode="lines+markers",
             name="STY (One-stage)",
-            line=dict(color="red"),
+            line=dict(color="red", dash="dash"),
             marker=dict(size=1, opacity=0),
             yaxis="y2",
             hovertemplate=(
@@ -85,7 +84,7 @@ def _plot_D_range_panel(
             mode="lines+markers",
             marker=dict(size=1, opacity=0),
             name="Biomass (Two-stage)",
-            line=dict(color="blue", dash="dash"),
+            line=dict(color="blue"),
             yaxis="y",
             customdata=custom_data,
             hovertemplate=(
@@ -105,7 +104,7 @@ def _plot_D_range_panel(
             mode="lines+markers",
             marker=dict(size=1, opacity=0),
             name="Product (Two-stage)",
-            line=dict(color="orange", dash="dash"),
+            line=dict(color="orange"),
             yaxis="y",
             customdata=custom_data,
             hovertemplate=(
@@ -124,7 +123,7 @@ def _plot_D_range_panel(
             y=STY_cascade,
             mode="lines+markers",
             name="STY (Two-stage)",
-            line=dict(color="red", dash="dash"),
+            line=dict(color="red"),
             marker=dict(size=1, opacity=0),
             yaxis="y2",
             customdata=custom_data,
@@ -136,28 +135,6 @@ def _plot_D_range_panel(
             ),
         )
     )
-    # STAGE 1
-    custom_data = np.stack((phi, ny), axis=-1)
-    # biomass 1
-    fig.add_trace(
-        go.Scatter(
-            x=D,
-            y=X1,
-            mode="lines+markers",
-            marker=dict(size=1, opacity=0),
-            name="Biomass (Stage 1)",
-            line=dict(color="blue", dash="dot"),
-            yaxis="y",
-            customdata=custom_data,
-            hovertemplate=(
-                "X<sub>1</sub> = %{y:.2f} g/L <br>D = %{x:.2f} /h"
-                "<br>ϕ = %{customdata[0]:.2f}"
-                "<br>ν = %{customdata[1]:.2f}"
-                "<extra></extra>"
-            ),
-        )
-    )
-
     fig.update_layout(
         yaxis=dict(title="Steady-State Concentration [g/L]", range=ylim),
         yaxis2=dict(
@@ -198,7 +175,6 @@ def plot_D_range(plotter, Data=None):
         X=conti_opt_ss["X_onestage"],
         S=conti_opt_ss["S_onestage"],
         P=conti_opt_ss["P_onestage"],
-        X1=conti_opt_ss["X1_opt"],
         X2=conti_opt_ss["X2_opt"],
         P2=conti_opt_ss["P2_opt"],
         STY=conti_opt_ss["STY_onestage"],
@@ -208,15 +184,14 @@ def plot_D_range(plotter, Data=None):
         ny=conti_opt_ss["ny_opt"],
         title="Steady states across dilution rate + corresponding optimized cascade",
         xlabel="Dilution rate [1/h]",
-        xlim=[0, np.max(conti_opt_ss["D_total"])],
+        xlim=[0, np.nanmax(conti_opt_ss["D_total"])],
         ylim=[
             0,
-            np.max(
+            np.nanmax(
                 [
                     *conti_opt_ss["X_onestage"],
                     *conti_opt_ss["S_onestage"],
                     *conti_opt_ss["P_onestage"],
-                    *conti_opt_ss["X1_opt"],
                     *conti_opt_ss["X2_opt"],
                     *conti_opt_ss["P2_opt"],
                 ]
@@ -225,7 +200,7 @@ def plot_D_range(plotter, Data=None):
         ],
         ylim_sty=[
             0,
-            np.max(
+            np.nanmax(
                 [
                     *conti_opt_ss["STY_onestage"],
                     *conti_opt_ss["STY_cascade"],
