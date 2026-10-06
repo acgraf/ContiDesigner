@@ -9,11 +9,16 @@ class Plotter:
     def plot_time_evolution(self, cascade=True):
         return time_evolution.plot_time_evolution(self, cascade)
     
-    def plot_D_range(self, Data=None):
-        return dilution_range.plot_D_range(self, Data)
+    def plot_D_range(self, Data=None, titer_min=None):
+        return dilution_range.plot_D_range(self, Data, titer_min)
 
-    def plot_contour(self, sweep="phi_ny", contour="delta_sty_opt", Data=None, ncontours=40):
-        return feed_volume_split.plot_contour(self, sweep, contour, Data, ncontours)
+    def plot_contour(
+        self, sweep="phi_ny", contour="delta_sty_opt", Data=None, ncontours=40,
+        titer_min=None,
+    ):
+        return feed_volume_split.plot_contour(
+            self, sweep, contour, Data, ncontours, titer_min
+        )
 
 
 

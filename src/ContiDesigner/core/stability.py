@@ -17,6 +17,15 @@ import numpy as np
 
 LAMBDA_MAX_THRESHOLD = -0.01
 
+## Relative criterion: the slowest mode must decay at least this fraction of
+## the dilution rate, i.e. relax within 1 / LAMBDA_REL_THRESHOLD residence
+## times. Away from washout lambda_max = -D (the product mode), so this is
+## inactive; it only bites in the band just below D1_max where the biomass
+## mode slows down. With a small Ks / sf1 (PHB) that band is narrow, and the
+## absolute threshold alone lets points at ~97 % of D1_max through
+## (lambda_max = -0.021 1/h at D1 = 0.238 1/h, i.e. ~11 residence times).
+LAMBDA_REL_THRESHOLD = 0.2
+
 _FD_REL_STEP = np.sqrt(np.finfo(float).eps)
 
 
@@ -173,6 +182,16 @@ def dominant_eigenvalue(model, state, stage=1, force_fd=False):
     return float(np.max(np.linalg.eigvals(J).real))
 
 
-def is_robust(lambda_max, threshold=LAMBDA_MAX_THRESHOLD):
-    """A steady state is accepted only if it relaxes fast enough."""
-    return bool(np.isfinite(lambda_max) and lambda_max < threshold)
+def is_robust(
+    lambda_max, D=None, threshold=LAMBDA_MAX_THRESHOLD, rel_threshold=LAMBDA_REL_THRESHOLD
+):
+    """
+    A steady state is accepted only if it relaxes fast enough: lambda_max
+    below the absolute threshold (1/h) and, if the stage's dilution rate D is
+    given, below -rel_threshold * D (near-washout states are rejected).
+    """
+    if not (np.isfinite(lambda_max) and lambda_max < threshold):
+        return False
+    if D is not None and np.isfinite(D) and D > 0:
+        return bool(lambda_max < -rel_threshold * D)
+    return True

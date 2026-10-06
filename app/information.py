@@ -30,6 +30,10 @@ tooltips = {
     "is_substrate_inhibited": "Enable substrate inhibition w/ an additional inhibition term",
     "is_biomass_inhibited": "Enable biomass inhibition w/ a max biomass concentration.",
     "is_product_inhibited": "Enable product inhibition w/ a max product concentration.",
+    "titer_min": "Optional minimum product titer of the two-stage process. "
+    "If set, the optimum maximizes STY only over operating conditions with "
+    "P₂ ≥ P₂,min. Dilution rates and (ϕ, ν) regions where it is not reached "
+    "are greyed out but can still be selected. Leave empty for no constraint.",
     # --- Results tooltips ---
     "optimal_header": "The optimal cascade and the corresponding one-stage process",
     "selected_header": "User selected process conditions. Either the optimal cascade at "

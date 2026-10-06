@@ -112,13 +112,13 @@ def plot_time_evolution(plotter, cascade=True):
         for i in range(N):
             if N == 2:
                 if i == 0:
-                    title = f"Growth reactor (D<sub>1</sub>: {plotter.model.D1:.2f} /h)"
+                    title = f"Growth reactor (D<sub>1</sub>: {plotter.model.D1:.3f} /h)"
                 else:
                     title = (
-                        f"Production reactor (D<sub>2</sub>: {plotter.model.D2:.2f} /h)"
+                        f"Production reactor (D<sub>2</sub>: {plotter.model.D2:.3f} /h)"
                     )
             else:
-                title = f"Reactor {i+1} (D<sub>{i+1}</sub>: {getattr(plotter.model, 'Ds')[i]:.2f} /h)"
+                title = f"Reactor {i+1} (D<sub>{i+1}</sub>: {getattr(plotter.model, 'Ds')[i]:.3f} /h)"
             subplot_titles.append(title)
 
         fig = make_subplots(
@@ -168,7 +168,7 @@ def plot_time_evolution(plotter, cascade=True):
         fig = make_subplots(
             rows=1,
             cols=1,
-            subplot_titles=(f"One stage (D: {plotter.model.D_total:.2f} /h)",),
+            subplot_titles=(f"One stage (D: {plotter.model.D_total:.3f} /h)",),
             specs=[[{"secondary_y": True}]],
         )
         fig = _plot_reactor(fig, 1, 1, t_span, df["X"], df["S"], df["P"], STY)

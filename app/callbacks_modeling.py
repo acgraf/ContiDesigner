@@ -59,6 +59,8 @@ def register_callbacks_modeling(app):
             yaxis_name = clicked_trace.get("yaxis", "y")
             stored.update(
                 {
+                    # restored if no process at D meets the minimum titer
+                    "D_prev": stored.get("D_total"),
                     "D_total": D,
                     "Y_clicked": y,
                     "curve_num": curve_num,
@@ -89,6 +91,9 @@ def register_callbacks_modeling(app):
             Output("optimal_cascade_model_sbml_store", "data"),
             Output("all4figures_run", "data"),
             Output("params_store", "data", allow_duplicate=True),
+            Output("titer_alert", "children"),
+            Output("titer_alert", "color"),
+            Output("titer_alert", "is_open"),
         ],
         [Input("checked_inputs_store", "data")],
         prevent_initial_call=True,
@@ -112,6 +117,8 @@ def register_callbacks_modeling(app):
             Output("selected_cascade_model_sbml_store_D_range", "data"),
             Output("all4figures_D_range", "data"),
             Output("shared_state", "data", allow_duplicate=True),
+            Output("titer_click_alert", "children"),
+            Output("titer_click_alert", "is_open"),
         ],
         [
             Input("shared_state", "data"),

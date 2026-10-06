@@ -49,7 +49,7 @@ class ContiModel:
             # for phi we care about the inflow from the previous reactor
             phi = Fs[i - 1] / self.F_total
             phis.append(phi)
-        # phi is the same for s1 as for s2 
+        # phi is the same for s1 as for s2
         phis[0] = phis[1]
 
         multistage_params = {
@@ -478,7 +478,7 @@ class ContiModel:
     def dilution_range_D(self, norm=False):
         # set a linspace of dilution rates from 0 to 1,
         # that will be limited by the maximum dilution rate
-        D_range = np.linspace(0, 1, 101)
+        D_range = np.linspace(0, 1, 201)
         mu_eff = self.limit_rate(self.mu_max, [0, self.sf1, 0])
         D_max = mu_eff - self.delta
         if D_max < 0:
@@ -492,7 +492,7 @@ class ContiModel:
         ## washout bound of stage 1 (a chemostat fed with sf1). Same value as
         ## D_max, the washout bound of the one-stage reference, but a different
         ## constraint: D1 = phi / (1 - ny) * D_total can be above or below D_total
-        buffer = 0#0.15
+        buffer = 0  # 0.15
         D_range = np.linspace(0, 1, 101)
         mu_eff = self.limit_rate(self.mu_max, [0, self.sf1, 0])
         D1_max_total = mu_eff - self.delta

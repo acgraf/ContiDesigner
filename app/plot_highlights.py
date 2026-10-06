@@ -44,9 +44,9 @@ def get_marker_props(contour, is_optimal, D_opt=None, D_value=None, x=None):
 def format_hover_text(contour, is_optimal, x, y, D_value=None, z=None):
     if contour:
         if is_optimal:
-            return f"Optimal TS at D = {D_value} /h<br>with ϕ = {x:.2f}, ν = {y:.2f}<br>ΔSTY = {(z):.2f}"
+            return f"Optimal TS at D = {D_value:.3f} /h<br>with ϕ = {x:.2f}, ν = {y:.2f}<br>ΔSTY = {(z):.2f}"
         else:
-            return f"Selected TS at D = {D_value}<br>with ϕ = {x:.2f} and ν = {y:.2f}"
+            return f"Selected TS at D = {D_value:.3f} /h<br>with ϕ = {x:.2f} and ν = {y:.2f}"
     else:
         return ""
 

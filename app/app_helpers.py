@@ -39,7 +39,7 @@ def make_cache_key(params):
 
 def check_input_params(params_store):
     checked_inputs = {"missing": [], "present": []}
-    optional = ["Yxs_2", "Yps_2", "Yas_2", "m_2", "pi0_s2", "pi1_s2"]
+    optional = ["Yxs_2", "Yps_2", "Yas_2", "m_2", "pi0_s2", "pi1_s2", "titer_min"]
     optional.append("Ki") if not params_store["is_substrate_inhibited"] else None
     optional.append("x_max") if not params_store["is_biomass_inhibited"] else None
     optional.append("p_max") if not params_store["is_product_inhibited"] else None
@@ -53,20 +53,35 @@ def check_input_params(params_store):
             checked_inputs["present"].append(key)
     return checked_inputs
 
-def build_figures(plotter, D_range=False, contour=None):
+def build_figures(plotter, D_range=False, contour=None, titer_min=None):
     # this just builds the 4 figures
     # and is called by run_simulation and by clicks in the D range or contour plot
     cascade_fig = plotter.plot_time_evolution(cascade=True)
     onestage_fig = plotter.plot_time_evolution(cascade=False)
     if contour:
-        contour_fig = plotter.plot_contour("phi_ny", "delta_STY_D", Data=contour)
+        contour_fig = plotter.plot_contour(
+            "phi_ny", "delta_STY_D", Data=contour, titer_min=titer_min
+        )
     else:
         contour_fig = None
     if D_range:
-        D_range_fig = plotter.plot_D_range(Data=D_range)
+        D_range_fig = plotter.plot_D_range(Data=D_range, titer_min=titer_min)
     else:
         D_range_fig = None
     return onestage_fig, cascade_fig, D_range_fig, contour_fig
+
+def placeholder_fig(text):
+    # empty figure with a centred message, used when there is nothing to plot
+    fig = go.Figure()
+    fig.update_layout(
+        template="simple_white",
+        xaxis=dict(visible=False),
+        yaxis=dict(visible=False),
+        annotations=[
+            dict(text=text, showarrow=False, xref="paper", yref="paper", x=0.5, y=0.5)
+        ],
+    )
+    return fig
 
 def from_store(store_data):
     # this converts stored figure dict back to a plotly figure
@@ -112,4 +127,5 @@ INPUT_MAP = {
     "is_substrate_inhibited": "is_substrate_inhibited",
     "is_biomass_inhibited": "is_biomass_inhibited",
     "is_product_inhibited": "is_product_inhibited",
+    "titer_min": "titer_min",
 }

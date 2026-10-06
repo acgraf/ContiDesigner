@@ -11,7 +11,7 @@ def _phi_ny_plotter(plotter):
     label_x = f"ϕ (F<sub>1</sub>/F)"
     y = "ny"
     label_y = f"ν (V<sub>2</sub>/V)"
-    title_base = f"D: {np.round(plotter.model.D_total,2)} /h"
+    title_base = f"D: {np.round(plotter.model.D_total, 3)} /h"
     return x, label_x, y, label_y, title_base
 
 
@@ -54,7 +54,8 @@ def _plotter_contour_dispatch(contour):
 
 
 def plot_contour(
-    plotter, sweep="phi_ny", contour="delta_STY_D", Data=None, ncontours=40
+    plotter, sweep="phi_ny", contour="delta_STY_D", Data=None, ncontours=40,
+    titer_min=None,
 ):
     """
     ----------
@@ -66,6 +67,9 @@ def plot_contour(
         "analytical" or "numerical"
     ncontours : int
         Number of contour levels
+    titer_min : float, optional
+        Minimum product titer; feasible cascades with P2 < titer_min are greyed
+        out and the P2 = titer_min isoline is drawn.
     """
     if Data is None:
         productivity = getattr(plotter.solver, f"steady_state_across_{sweep}")()
@@ -208,7 +212,50 @@ def plot_contour(
             hoverinfo="skip",
         )
     )
-    
+    if titer_min is not None:
+        p2_grid = df.pivot(index=y_col, columns=x_col, values="P2").values
+        p2_grid = np.where(infeasible_mask, np.nan, p2_grid)
+        # titer shortfall (> 0 where P2 < titer_min), so the fill edge matches
+        # the isoline. plotly paints the whole plot area in the colour of the
+        # band below the first level and only draws the upper band on top, so
+        # the grey must be the upper band, otherwise everything is greyed out
+        fig.add_trace(
+            go.Contour(
+                z=titer_min - p2_grid,
+                x=x_vals,
+                y=y_vals,
+                contours=dict(start=0, end=0, size=1, coloring="fill"),
+                colorscale=[
+                    [0.0, "rgba(0,0,0,0)"],  # titer reached
+                    [1.0, "rgba(90,90,90,0.45)"],  # titer not reached
+                ],
+                showscale=False,
+                hoverinfo="skip",
+                name="titer_region",
+            )
+        )
+        fig.add_trace(
+            go.Contour(
+                z=p2_grid,
+                x=x_vals,
+                y=y_vals,
+                contours=dict(
+                    start=titer_min,
+                    end=titer_min,
+                    size=1,
+                    coloring="none",
+                    showlines=True,
+                    showlabels=True,
+                    labelfont=dict(color="darkorange"),
+                ),
+                line=dict(color="darkorange", width=3, dash="dash"),
+                showscale=False,
+                hoverinfo="skip",
+                showlegend=False,
+                name="titer_line",
+            )
+        )
+
     fig.update_layout(
         xaxis_title=label_x,
         yaxis_title=label_y,

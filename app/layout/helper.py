@@ -93,6 +93,10 @@ labels = {
         dcc.Markdown(r"$P^{\mathrm{max}}$", mathjax=True, className="mb-0"),
         html.Span("[g/L]", className="text-muted"),
     ],
+    "titer_min": [
+        dcc.Markdown(r"$P^{\mathrm{min}}_2$", mathjax=True, className="mb-0"),
+        html.Span("[g/L]", className="text-muted"),
+    ],
     "Ki": [
         dcc.Markdown(r"$K^\mathrm{I}$", mathjax=True, className="mb-0"),
         html.Span("[g/L]", className="text-muted"),

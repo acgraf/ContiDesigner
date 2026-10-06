@@ -122,8 +122,30 @@ time_evolution_card_cascade = dbc.Col(
     md=8,
 )
 
+titer_alerts = dbc.Row(
+    dbc.Col(
+        [
+            # minimum titer constraint: status of the last run
+            dbc.Alert(id="titer_alert", is_open=False, className="mt-3 mb-0"),
+            # D range click outside the feasible titer region
+            dbc.Alert(
+                id="titer_click_alert",
+                color="warning",
+                is_open=False,
+                dismissable=True,
+                duration=8000,
+                className="mt-3 mb-0",
+            ),
+        ],
+        md=12,
+    ),
+    # no vertical padding, so it takes no space while the alerts are closed
+    className="px-4",
+)
+
 results_layout = html.Div(
     children=[
+        titer_alerts,
         dbc.Row(
             [
                 dbc.Col(
@@ -152,7 +174,7 @@ results_layout = html.Div(
                     md=4,
                 ),
             ],
-            className="p-4",
+            className="px-4 pb-4 pt-3",
         ),
     ],
 )

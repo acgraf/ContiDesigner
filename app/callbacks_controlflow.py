@@ -161,8 +161,11 @@ def register_callbacks_controlflow(app):
         D = shared_state.get("D_total")
         phi = shared_state.get("phi_sel")
         ny = shared_state.get("ny_sel")
-        onestage_header = f"One-stage process (D= {D:.2f} /h)"
-        cascade_header = f"Two-stage process (D= {D:.2f} /h, Φ = {phi:.2f}, ν= {ny:.2f})"
+        if None in (D, phi, ny):
+            # no feasible process (minimum titer not reached)
+            return "One-stage process", "Two-stage process"
+        onestage_header = f"One-stage process (D= {D:.3f} /h)"
+        cascade_header = f"Two-stage process (D= {D:.3f} /h, Φ = {phi:.2f}, ν= {ny:.2f})"
         return onestage_header, cascade_header
 
     # this function needs a callback, so the params store
@@ -221,6 +224,7 @@ def register_callbacks_controlflow(app):
             "is_substrate_inhibited": is_substrate_inhibited,
             "is_biomass_inhibited": is_biomass_inhibited,
             "is_product_inhibited": is_product_inhibited,
+            "titer_min": f("titer_min"),
             "t_span": np.linspace(0, 100, 201),
         }
         return params_dict

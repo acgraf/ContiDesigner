@@ -7,13 +7,15 @@ import numpy as np
 tooltips = information.tooltips
 
 
-def metric_row(label, one_stage_val, cascade_val, unit=None, tooltip=None, row_id=None):
+def metric_row(
+    label, one_stage_val, cascade_val, unit=None, tooltip=None, row_id=None, decimals=2
+):
     """Create a formatted metric row comparing one-stage and cascade values."""
     row_id = row_id or label.replace(" ", "_")
 
     def fmt(val):
         try:
-            return f"{float(val):.2f}"
+            return f"{float(val):.{decimals}f}"
         except (ValueError, TypeError):
             return str(val)
 
@@ -97,12 +99,12 @@ def summarize_process(
     else:
         if optimal_for_D:
             title_text = header_with_icon(
-                icons["diamond"], f"Optimal Process at D = {model.D_total} /h"
+                icons["diamond"], f"Optimal Process at D = {model.D_total:.3f} /h"
             )
             header_style = {"color": "black"}
         else:
             title_text = header_with_icon(
-                icons["triangle-up"], f"Selected Process at D = {model.D_total:.2f} /h"
+                icons["triangle-up"], f"Selected Process at D = {model.D_total:.3f} /h"
             )
             header_style = {"color": "#6A1B9A"}
         # special case: when the selected process at the chosen D
@@ -266,10 +268,11 @@ def summarize_process(
                             metric_row(
                                 "Dilution Rate",
                                 model.D_total,
-                                f"{model.D1:.2f}, {model.D2:.2f}",
+                                f"{model.D1:.3f}, {model.D2:.3f}",
                                 unit="[1/h]",
                                 tooltip=tooltips["dilution_rate"],
                                 row_id=f"{prefix}_dilution_rate",
+                                decimals=3,
                             ),
                             html.Hr(className="my-2"),
                         ],

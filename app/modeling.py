@@ -7,6 +7,8 @@ from .plot_highlights import add_highlight_marker
 from .export_sbml import export_contimodel_to_sbml
 from app.layout.summary_cards import summarize_process
 import numpy as np
+import pandas as pd
+import io
 from dash import no_update
 
 cache = None 
@@ -26,11 +28,21 @@ def cached_run_simulation(params):
 def get_optimum(params, solver, D_given=None):
     max_param = "STY_cascade"
     secondary_param = "X1"
+    # optional minimum product titer (g/L), None = no constraint
+    p_min = params.get("titer_min")
     if D_given is None:
-        grid_df, D_opt, STY= solver.optimize_phi_ny_across_D(max_param=max_param, secondary_param=secondary_param)
+        grid_df, D_opt, STY= solver.optimize_phi_ny_across_D(max_param=max_param, secondary_param=secondary_param, p_min=p_min)
+        if not np.isfinite(D_opt):
+            # no operating condition reaches the minimum titer
+            return {
+                "opt_params": None,
+                "D_grid_df": grid_df.to_json(orient="records"),
+                "phi_ny_grid_df": None,
+            }
         with solver.model.temporary_params({"D_total": D_opt}):
             phi_opt, ny_opt, phi_ny_grid, improv = solver.find_optimum_phi_ny(
-                max_D=D_opt, max_param=max_param, secondary_param=secondary_param
+                max_D=D_opt, max_param=max_param, secondary_param=secondary_param,
+                p_min=p_min,
             )
         opt = {
             "D_opt": float(D_opt),
@@ -47,7 +59,7 @@ def get_optimum(params, solver, D_given=None):
     else:
         with solver.model.temporary_params({"D_total": D_given}):
             phi_opt, ny_opt, phi_ny_grid, delta_STY_D = (
-                solver.find_optimum_phi_ny(max_D=D_given, max_param=max_param, secondary_param=secondary_param)
+                solver.find_optimum_phi_ny(max_D=D_given, max_param=max_param, secondary_param=secondary_param, p_min=p_min)
             )
         opt = {
             "D_opt": float(D_given),
@@ -61,6 +73,66 @@ def get_optimum(params, solver, D_given=None):
             "phi_ny_grid_df": phi_ny_grid.to_json(orient="records"),
         }
     return optimized_process
+
+
+def titer_alert(titer_min, D_grid):
+    """
+    Warning for the results page if no operating point reaches the minimum
+    titer: (children, color, is_open).
+    """
+    if titer_min is None:
+        return "", "info", False
+    df = pd.read_json(io.StringIO(D_grid))
+    feasible = df[df["titer_ok"].astype(bool)] if "titer_ok" in df else df[:0]
+    if feasible.empty:
+        text = (
+            f"No feasible operating point: no two-stage process reaches "
+            f"P₂,min = {titer_min:g} g/L. The two-stage curves show the "
+            "STY-optimal process without this constraint."
+        )
+        if "P2_max" in df and np.isfinite(df["P2_max"]).any():
+            best = df.loc[df["P2_max"].idxmax()]
+            text += (
+                f" The highest achievable titer is {best['P2_max']:.2f} g/L "
+                f"(D = {best['D_total']:.3f} /h)."
+            )
+        text += " Lower P₂,min or change the process parameters."
+        return text, "warning", True
+    # constraint met somewhere: the greyed-out regions explain themselves
+    return "", "info", False
+
+
+def run_infeasible(params, base_model, base_solver, D_grid):
+    # no operating condition meets the minimum titer: show the D range only
+    plotter = Plotter(base_model, base_solver)
+    D_range_fig = plotter.plot_D_range(Data=D_grid, titer_min=params["titer_min"])
+    message = "No operating point reaches the minimum titer"
+    figures_dicts = {
+        "onestage": app_helpers.fig_to_dict(app_helpers.placeholder_fig(message)),
+        "cascade": app_helpers.fig_to_dict(app_helpers.placeholder_fig(message)),
+        "D_range": app_helpers.fig_to_dict(D_range_fig),
+        "contour": app_helpers.fig_to_dict(app_helpers.placeholder_fig(message)),
+    }
+    shared_state = {
+        "D_total": None,
+        "phi_sel": None,
+        "ny_sel": None,
+        "trigger_source": "initial_optimal",
+    }
+    params.update({"D_total_opt": None, "phi_opt": None, "ny_opt": None})
+    return (
+        {"infeasible": True},
+        D_grid,
+        None,
+        shared_state,
+        None,
+        None,
+        None,
+        None,
+        figures_dicts,
+        params,
+        *titer_alert(params["titer_min"], D_grid),
+    )
 
 
 def run_simulation(params):
@@ -77,6 +149,8 @@ def run_simulation(params):
     D_grid = optimal_process["D_grid_df"]
     phi_ny_grid = optimal_process["phi_ny_grid_df"]
     opt_values = optimal_process["opt_params"]
+    if opt_values is None:
+        return run_infeasible(params, base_model, base_solver, D_grid)
     # this updates the parameters globally
     params.update(
         {
@@ -97,7 +171,8 @@ def run_simulation(params):
     STY_cascade_opt = opt_solver.calculate_STY(steady_states_cascade[-1], opt_values["D_opt"])
     # create the 4 figures
     onestage_fig_opt, cascade_fig_opt, D_range_fig, contour_fig = app_helpers.build_figures(
-        opt_plotter, D_range=D_grid, contour=phi_ny_grid
+        opt_plotter, D_range=D_grid, contour=phi_ny_grid,
+        titer_min=params.get("titer_min"),
     )
     # add optimal markers
     D_range_fig = add_highlight_marker(
@@ -164,6 +239,7 @@ def run_simulation(params):
         sbml_model_opt_cascade,
         opt_figures_dicts,
         params,
+        *titer_alert(params.get("titer_min"), D_grid),
     )
     return result
 
@@ -182,6 +258,37 @@ def handle_drange_click(
         # nothing to plot yet
         raise PreventUpdate
 
+    # Recalculate process summary for selected D
+    params = params_store
+    params["D_total"] = D_sel
+    model_sel = ContiModel(params)
+    solver_sel = Solver(model_sel)
+    optimal_process = get_optimum(params, solver_sel, D_given=D_sel)
+    phi_ny_grid = optimal_process["phi_ny_grid_df"]
+    selected_values = optimal_process["opt_params"]
+    titer_missed = False
+    if not np.isfinite(selected_values["phi_opt"]) and params.get("titer_min") is not None:
+        # no two-stage process at this D reaches the minimum titer:
+        # select the unconstrained optimum at this D instead
+        optimal_process = get_optimum(
+            {**params, "titer_min": None}, solver_sel, D_given=D_sel
+        )
+        phi_ny_grid = optimal_process["phi_ny_grid_df"]
+        selected_values = optimal_process["opt_params"]
+        titer_missed = True
+    if not np.isfinite(selected_values["phi_opt"]):
+        # no feasible two-stage process at this D at all:
+        # keep the current selection
+        restored_state = shared_state.copy()
+        restored_state.update(
+            {"D_total": shared_state.get("D_prev"), "trigger_source": "D_range_plot"}
+        )
+        notice = (
+            f"At D = {D_sel:.3f} /h no feasible two-stage process exists. "
+            "The selection was not changed."
+        )
+        return (*[no_update] * 7, restored_state, notice, True)
+
     D_range_fig = app_helpers.from_store(D_range_fig_store)
     secondary_y = shared_state["yaxis_name"] == "y2"
     D_range_selected = add_highlight_marker(
@@ -192,14 +299,6 @@ def handle_drange_click(
         is_optimal=False,
         secondary_y=secondary_y,
     )
-    # Recalculate process summary for selected D
-    params = params_store
-    params["D_total"] = D_sel
-    model_sel = ContiModel(params)
-    solver_sel = Solver(model_sel)
-    optimal_process = get_optimum(params, solver_sel, D_given=D_sel)
-    phi_ny_grid = optimal_process["phi_ny_grid_df"]
-    selected_values = optimal_process["opt_params"]
     # build a new model with the optimal phi and ny at this D
     params.update(
         {
@@ -211,6 +310,14 @@ def handle_drange_click(
     solver_sel = Solver(model_sel)
     steady_states_cascade = solver_sel.calculate_steady_states()
     steady_states_OS = solver_sel.calculate_steady_states(cascade=False)
+    notice = ""
+    if titer_missed:
+        notice = (
+            f"At D = {D_sel:.3f} /h no two-stage process reaches "
+            f"P₂,min = {params['titer_min']:g} g/L (greyed-out region). "
+            "Showing the STY-optimal two-stage process at this D without the "
+            f"constraint (P₂ = {steady_states_cascade[-1]:.2f} g/L)."
+        )
     sel_summary_card, sel_summary_data = summarize_process(
         steady_states_cascade,
         steady_states_OS,
@@ -222,7 +329,7 @@ def handle_drange_click(
     )
     plotter_sel = Plotter(model_sel, solver_sel)
     onestage_selected, cascade_selected, _, contour_fig = app_helpers.build_figures(
-        plotter_sel, contour=phi_ny_grid
+        plotter_sel, contour=phi_ny_grid, titer_min=params.get("titer_min")
     )
     contour_selected = add_highlight_marker(
         contour_fig,
@@ -263,6 +370,8 @@ def handle_drange_click(
         sbml_model_cascade_sel,
         figures_dicts,
         updated_shared_state,
+        notice,
+        bool(notice),
     )
 
 

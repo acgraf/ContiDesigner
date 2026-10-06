@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from ..utils import helpers
-from scipy.optimize import root
+from scipy.optimize import root, minimize, minimize_scalar
 from scipy.integrate import solve_ivp
 from . import steadystate_eqs
 from . import stability
@@ -125,12 +125,6 @@ class Solver:
                 x1 = self.calculate_x_OS()
                 s1 = self.calculate_s_OS()
                 p1 = self.calculate_p_OS(x1=x1)
-            # We only do stability analysis for cases without inhibition for now. 
-            lam = stability.dominant_eigenvalue(self.model, [x1, s1, p1], stage=1)
-            self.last_lambda1 = lam
-            if not stability.is_robust(lam):
-                return [np.nan] * 3
-            
             if self.model.is_product_inhibited or self.model.is_biomass_inhibited:
                 guess1 = [x1, s1, p1]
 
@@ -151,7 +145,11 @@ class Solver:
                     x1, s1, p1 = y[:3]
             if not np.isfinite(s1) or s1 < 0:
                 return [np.nan] * 3
-            
+            # on the refined state, as for the cascade below
+            lam = stability.dominant_eigenvalue(self.model, [x1, s1, p1], stage=1)
+            self.last_lambda1 = lam
+            if not stability.is_robust(lam, D=self.model.D_total):
+                return [np.nan] * 3
 
             states = [x1, s1, p1]
             return states
@@ -194,7 +192,7 @@ class Solver:
                 return [np.nan] * (3 * self.model.N_reactors)
             lam1 = stability.dominant_eigenvalue(self.model, [x1, s1, p1], stage=1)
             self.last_lambda1 = lam1
-            if not stability.is_robust(lam1):
+            if not stability.is_robust(lam1, D=self.model.D1):
                 return [np.nan] * (3 * self.model.N_reactors)
 
             states = [x1, s1, p1]
@@ -320,8 +318,14 @@ class Solver:
         return param_max, D_optimum, steady_states
 
     def find_optimum_phi_ny(
-        self, max_D=None, max_param="STY_cascade", secondary_param="X_onestage"
+        self, max_D=None, max_param="STY_cascade", secondary_param="X_onestage",
+        p_min=None,
     ):
+        """
+        p_min: optional minimum product titer (g/L) of the two-stage process;
+        (phi, ny) pairs with P2 < p_min are excluded from the optimization.
+        The returned grid is not filtered.
+        """
         if max_D is None:
             _, max_D = self.find_optimum_D_total()
 
@@ -331,11 +335,14 @@ class Solver:
                 raise ValueError(
                     f"max_param must be one of {steady_states.columns.tolist()}"
                 )
-            best = steady_states[max_param].max()
+            objective = steady_states[max_param]
+            if p_min is not None:
+                objective = objective.where(steady_states["P2"] >= p_min)
+            best = objective.max()
             if not np.isfinite(best):
                 # no (phi, ny) pair is feasible at this D_total
                 return np.nan, np.nan, steady_states, np.nan
-            best_state = steady_states.loc[steady_states[max_param].idxmax()]
+            best_state = steady_states.loc[objective.idxmax()]
             # near_opt = steady_states[steady_states[max_param] >= best]
             # best_state = near_opt.iloc[0]
             phi_param_max = best_state["phi"]
@@ -345,11 +352,16 @@ class Solver:
         return phi_param_max, ny_param_max, steady_states, delta_STY_D
 
     def optimize_phi_ny_across_D(
-        self, max_param="STY_cascade", secondary_param="X1", tol=0.01
+        self, max_param="STY_cascade", secondary_param="X1", tol=0.01, p_min=None
     ):
         """
         Sweep across D_total values, and for each, optimize phi and ny
         to maximize the given max_param (default STY_cascade).
+        With p_min (minimum product titer, g/L), only (phi, ny) with P2 >= p_min
+        are considered; D_total values where none qualifies keep the
+        unconstrained optimum with titer_ok = False and are not candidates
+        for D_opt, which is NaN if no D_total qualifies. P2_max is the highest
+        P2 of a feasible cascade at each D_total.
         Returns a DataFrame with:
             D_total, X_onestage, S_onestage, P_onestage,
             phi_opt, ny_opt, X2_opt, S2_opt, P2_opt, STY_cascade_opt
@@ -361,10 +373,18 @@ class Solver:
             with self.model.temporary_params({"D_total": D_val}):
                 # Optimize phi, ny for this D_total
                 phi_opt, ny_opt, phi_ny_grid, rel_improv = self.find_optimum_phi_ny(
-                    max_D=D_val, max_param=max_param, secondary_param=secondary_param
+                    max_D=D_val, max_param=max_param, secondary_param=secondary_param,
+                    p_min=p_min,
                 )
+                titer_ok = True
                 if not (np.isfinite(phi_opt) and np.isfinite(ny_opt)):
-                    continue          # skip this D_total
+                    if p_min is None or not np.isfinite(phi_ny_grid[max_param]).any():
+                        continue          # skip this D_total
+                    # feasible cascades exist, but none reaches the titer:
+                    # keep the unconstrained optimum, flagged by titer_ok
+                    best_state = phi_ny_grid.loc[phi_ny_grid[max_param].idxmax()]
+                    phi_opt, ny_opt = best_state["phi"], best_state["ny"]
+                    titer_ok = False
                 # With optimal phi, ny, recompute steady states analytically
                 with self.model.temporary_params({"phi": phi_opt, "ny": ny_opt}):
                     steady_states = self.calculate_steady_states()
@@ -409,8 +429,31 @@ class Solver:
                         "STY_2": STY_2,
                     }
                 )
+                if p_min is not None:
+                    results[-1]["titer_ok"] = titer_ok
+                    results[-1]["P2_max"] = (
+                        phi_ny_grid["P2"]
+                        .where(np.isfinite(phi_ny_grid[max_param]))
+                        .max()
+                    )
 
         df = pd.DataFrame(results)
+        if p_min is not None:
+            # the selection below only considers D_total values with a
+            # two-stage process meeting p_min
+            candidates = df[df["titer_ok"]] if not df.empty else df
+            if candidates.empty:
+                return df, np.nan, np.nan
+            onestage_ok = candidates[candidates["P_onestage"] >= p_min]
+            D_opt_cascade = candidates.loc[candidates["STY_cascade"].idxmax(), "D_total"]
+            STY_cascade_max = candidates["STY_cascade"].max()
+            if not onestage_ok.empty and STY_cascade_max <= onestage_ok[
+                "STY_onestage"
+            ].max() * (1 + tol):
+                D_opt = onestage_ok.loc[onestage_ok["STY_onestage"].idxmax(), "D_total"]
+            else:
+                D_opt = D_opt_cascade
+            return df, D_opt, STY_cascade_max
 
         # Identify best D_total according to STY_cascade
         best_D_total_idx = df["STY_cascade"].idxmax()
@@ -429,6 +472,83 @@ class Solver:
             D_opt = D_opt_cascade
 
         return df, D_opt, STY_cascade_max
+
+    def optimize_onestage_continuous(self, n_scan=60):
+        """
+        Exact STY optimum of the one-stage process (not used by the app).
+        Scan of D up to D_max, then a bounded 1-D search around the best point.
+        Returns a dict with D_opt and STY_onestage (NaN if nothing is feasible).
+        """
+        D_max = self.model.D_max
+
+        def neg_sty(D):
+            with self.model.temporary_params({"D_total": float(D)}):
+                P = self.calculate_steady_states(cascade=False)[2]
+            return -D * P if np.isfinite(P) and P >= 0 else np.inf
+
+        Ds = np.linspace(D_max / n_scan, D_max * 0.999, n_scan)
+        vals = [neg_sty(D) for D in Ds]
+        i = int(np.argmin(vals))
+        if not np.isfinite(vals[i]):
+            return {"D_opt": np.nan, "STY_onestage": np.nan}
+        r = minimize_scalar(
+            neg_sty,
+            bounds=(Ds[max(i - 1, 0)], Ds[min(i + 1, n_scan - 1)]),
+            method="bounded",
+            options={"xatol": 1e-9},
+        )
+        D_opt, f = (r.x, r.fun) if r.fun < vals[i] else (Ds[i], vals[i])
+        return {"D_opt": float(D_opt), "STY_onestage": float(-f)}
+
+    def optimize_cascade_continuous(self, x0=None):
+        """
+        Exact STY optimum of the two-stage cascade (not used by the app, which
+        keeps the grid of optimize_phi_ny_across_D).
+
+        Nelder-Mead over (D_total, phi, ny), started from x0 = (D, phi, ny) or,
+        if x0 is None, from the grid optimum of optimize_phi_ny_across_D. Uses
+        the same feasibility rules as the grid: D_total <= D_max, D1 <= D1_max,
+        and a steady state that passes the stability check, with P2 >= 0.
+        Returns a dict with D_opt, phi_opt, ny_opt, STY_cascade, and the grid
+        start point.
+        """
+        if self.model.N_reactors != 2:
+            raise ValueError("optimize_cascade_continuous supports two stages only")
+        D_max, D1_max = self.model.D_max, self.model.D1_max
+
+        def neg_sty(x):
+            D, phi, ny = map(float, x)
+            if not (0 < D <= D_max and 0 < phi <= 1 and 0 < ny < 1):
+                return np.inf
+            if phi / (1 - ny) * D > D1_max:
+                return np.inf
+            with self.model.temporary_params({"D_total": D, "phi": phi, "ny": ny}):
+                P2 = self.calculate_steady_states()[5]
+            return -D * P2 if np.isfinite(P2) and P2 >= 0 else np.inf
+
+        if x0 is None:
+            df = self.optimize_phi_ny_across_D(max_param="STY_cascade")[0]
+            best = df.loc[df["STY_cascade"].idxmax()]
+            x0 = (best["D_total"], best["phi_opt"], best["ny_opt"])
+        x0 = np.array(x0, float)
+        f0 = neg_sty(x0)
+        if not np.isfinite(f0):
+            raise ValueError(f"start point {tuple(x0)} is infeasible")
+        r = minimize(
+            neg_sty,
+            x0,
+            method="Nelder-Mead",
+            options={"xatol": 1e-8, "fatol": 1e-12, "maxiter": 3000},
+        )
+        x, f = (r.x, r.fun) if r.fun < f0 else (x0, f0)
+        D, phi, ny = map(float, x)
+        return {
+            "D_opt": D,
+            "phi_opt": phi,
+            "ny_opt": ny,
+            "STY_cascade": float(-f),
+            "start": tuple(map(float, x0)),
+        }
 
     def calculate_STY(self, p, D):
         STY = p * D

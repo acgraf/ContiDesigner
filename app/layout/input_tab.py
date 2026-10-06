@@ -6,9 +6,10 @@ from app.layout.helper import labels
 from app.information import tooltips
 
 
-def labeled_input(label, input_id):
+def labeled_input(label, input_id, placeholder=None):
     """Create a labeled input with an optional tooltip."""
     input_props = {
+        "placeholder": placeholder,
         "id": input_id,
         "className": "form-control-sm border-1 shadow-sm",
         "style": {"backgroundColor": "#f9f9f9"},
@@ -40,8 +41,8 @@ def labeled_input(label, input_id):
     )
 
 
-def input_col(label, input_id, md=6):
-    return dbc.Col(labeled_input(label, input_id), md=md)
+def input_col(label, input_id, md=6, placeholder=None):
+    return dbc.Col(labeled_input(label, input_id, placeholder), md=md)
 
 
 def section_card(title, description, content):
@@ -508,12 +509,18 @@ process_settings = dbc.Col(
         "Define operational conditions for the reactor system.",
         dbc.Row(
             [
-                input_col(labels["V"], "V_total", md=4),
-                input_col(labels["sf1"], "sf1", md=4),
+                input_col(labels["V"], "V_total", md=6),
+                input_col(labels["sf1"], "sf1", md=6),
                 input_col(
                     labels["sf2_max"],
                     "sf2_max",
-                    md=4,
+                    md=6,
+                ),
+                input_col(
+                    labels["titer_min"],
+                    "titer_min",
+                    md=6,
+                    placeholder="none (optional)",
                 ),
                 html.Hr(className="my-2"),
                 dbc.Row(
