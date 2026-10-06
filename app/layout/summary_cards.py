@@ -97,14 +97,14 @@ def summarize_process(
     else:
         if optimal_for_D:
             title_text = header_with_icon(
-                icons["triangle-up"], f"Optimal Process at D = {model.D_total} /h"
-            )
-            header_style = {"color": "#17a2b8"}
-        else:
-            title_text = header_with_icon(
-                icons["diamond"], f"Selected Process at D = {model.D_total:.2f} /h"
+                icons["diamond"], f"Optimal Process at D = {model.D_total} /h"
             )
             header_style = {"color": "black"}
+        else:
+            title_text = header_with_icon(
+                icons["triangle-up"], f"Selected Process at D = {model.D_total:.2f} /h"
+            )
+            header_style = {"color": "#6A1B9A"}
         # special case: when the selected process at the chosen D
         # is also the optimal process at the chosen D
         # this is already handled by the marker in the plot,

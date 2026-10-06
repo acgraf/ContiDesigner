@@ -5,7 +5,7 @@ def get_marker_props(contour, is_optimal, D_opt=None, D_value=None, x=None):
     """
     Return symbol, color, and size for a marker based on its type and context.
     """
-    size = 14 if is_optimal else 10
+    #size = 14 if is_optimal else 10
     symbol = "diamond"
     color = "black"
 
@@ -14,22 +14,29 @@ def get_marker_props(contour, is_optimal, D_opt=None, D_value=None, x=None):
             if D_value == D_opt:
                 symbol = "star"
                 color = "violet"
+                size = 14
             else:
-                symbol = "triangle-up"
-                color = "#17a2b8"
+                # best process at a non-optimal D: same marker as in the D-range plot
+                symbol = "diamond"
+                color = "black"
+                size = 10
         else:
-            symbol = "diamond"
-            color = "black"
+            symbol = "triangle-up"
+            color = "#6A1B9A"
+            size = 12
     else:
         if is_optimal:
             symbol = "star"
             color = "violet"
+            size = 14
         elif x == D_opt:
             symbol = None  # skip marker
             color = None
+            size = None
         else:
             symbol = "diamond"
             color = "black"
+            size = 10
 
     return symbol, color, size
 

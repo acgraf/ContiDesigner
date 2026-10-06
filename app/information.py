@@ -32,7 +32,7 @@ tooltips = {
     "is_product_inhibited": "Enable product inhibition w/ a max product concentration.",
     # --- Results tooltips ---
     "optimal_header": "The optimal cascade and the corresponding one-stage process",
-    "selected_header": "User selected process conditions. Either the optimal cascade at"
+    "selected_header": "User selected process conditions. Either the optimal cascade at "
     "the selected D (diamond) or a user selected point (triangle)",
     "substrate_feed": "Substrate concentration in the feed",
     "biomass_concentration": "Steady state biomass concentration",
