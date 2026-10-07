@@ -3,122 +3,89 @@ import dash_bootstrap_components as dbc
 
 
 def grid_download_button(item):
-    label = "Download grid"
-    button = dbc.Col(
-        dbc.Button(
-            label,
-            id=f"download_{item}_grid_btn",
-            color="light",
-            className="px-1 py-1 border shadow-sm",
-            style={
-                "whiteSpace": "nowrap",
-            },
-        ),
-        className="justify-content-center",
-        md=3,
+    # same look as the download buttons in the summary cards
+    return dbc.Button(
+        "Download grid",
+        id=f"download_{item}_grid_btn",
+        color="light",
+        className="px-4 py-2 border shadow-sm",
+        style={"whiteSpace": "nowrap"},
     )
-    return button
 
 
-D_range_card = dbc.Col(
-    dbc.Card(
-        [
-            dbc.CardHeader(
-                "Design Space over Dilution Rate (D)",
-                className="mb-0",
-                style={"borderBottom": "none"},
-            ),
-            dcc.Graph(
-                id="D_range_plot",  #
-                style={"width": "100%"},
-            ),
-            html.Div(
-                grid_download_button("D_range"),
-                className="d-flex justify-content-center mt-2 mb-2",
-            ),
-        ],
-        className="shadow-sm",
-    ),
-    md=6,
+def fill_graph(graph_id, min_height, loading=True):
+    """Graph that fills the free height of its card.
+
+    The graph is positioned absolutely, so it adds no height of its own: the
+    row height is set by the summary card next to it (or by min_height), and
+    all cards in the row (h-100) end at the same height.
+    responsive=True lets plotly follow the container (it unsets a fixed
+    figure height).
+    """
+    fill = {"position": "absolute", "inset": 0}
+    graph = dcc.Graph(
+        id=graph_id,
+        responsive=True,
+        style={"width": "100%", "height": "100%"} if loading else fill,
+    )
+    if loading:
+        graph = dcc.Loading(graph, parent_style=fill)
+    return html.Div(
+        graph,
+        style={"position": "relative", "flex": "1 1 auto", "minHeight": min_height},
+    )
+
+
+def plot_card(header, graph, footer=None, md=4):
+    header_kwargs = header if isinstance(header, dict) else {"children": header}
+    return dbc.Col(
+        dbc.Card(
+            [
+                dbc.CardHeader(
+                    **header_kwargs,
+                    className="mb-0",
+                    style={"borderBottom": "none"},
+                ),
+                graph,
+            ]
+            + ([footer] if footer else []),
+            className="shadow-sm h-100",
+        ),
+        md=md,
+    )
+
+
+def grid_download_footer(item):
+    return html.Div(
+        grid_download_button(item),
+        className="d-flex justify-content-center pt-2 pb-3",
+    )
+
+
+# sweep plots: as high as the optimal summary card, at least 300 px of graph
+D_range_card = plot_card(
+    "Design Space over Dilution Rate (D)",
+    fill_graph("D_range_plot", "300px", loading=False),
+    grid_download_footer("D_range"),
 )
 
-Contour_card = dbc.Col(
-    dbc.Card(
-        [
-            dbc.CardHeader(
-                "Design Space over feed and volume split at D",
-                className="mb-0",
-                style={"borderBottom": "none"},
-            ),
-            dcc.Loading(
-                dcc.Graph(
-                    id="contour_plot",
-                    style={"width": "100%"},
-                )
-            ),
-            html.Div(
-                grid_download_button("contour"),
-                className="d-flex justify-content-center mt-2 mb-2",
-            ),
-        ],
-        className="shadow-sm",
-    ),
-    md=6,
+Contour_card = plot_card(
+    "Design Space over feed and volume split at D",
+    fill_graph("contour_plot", "300px"),
+    grid_download_footer("contour"),
 )
 
-
-time_evolution_card_onestage = dbc.Col(
-    dbc.Card(
-        [
-            dbc.CardHeader(
-                id="onestage_header",
-                className="mb-0",
-                style={"borderBottom": "none"},
-            ),
-            dbc.CardBody(
-                [
-                    dcc.Loading(
-                        html.Div(
-                            dcc.Graph(
-                                id="onestage_fig",
-                                style={"width": "100%"},
-                            ),
-                        ),
-                    ),
-                ],
-                className="shadow-sm p-0",
-            ),
-        ],
-    ),
+# time evolution: as high as the selected summary card, at least 400 px of
+# graph (keeps them readable while no process is selected)
+time_evolution_card_onestage = plot_card(
+    {"id": "onestage_header"},
+    fill_graph("onestage_fig", "400px"),
     md=4,
 )
 
-
-time_evolution_card_cascade = dbc.Col(
-    dbc.Card(
-        [
-            dbc.CardHeader(
-                id="cascade_header",
-                className="mb-0",
-                style={"borderBottom": "none"},
-            ),
-            dbc.CardBody(
-                [
-                    dcc.Loading(
-                        html.Div(
-                            dcc.Graph(
-                                id="cascade_fig",
-                                style={
-                                    "width": "100%",
-                                },
-                            ),
-                        ),
-                    ),
-                ],
-                className="shadow-sm p-0",
-            ),
-        ],
-    ),
+time_evolution_card_cascade = plot_card(
+    {"id": "cascade_header"},
+    fill_graph("cascade_fig", "400px"),
     md=8,
 )
 
@@ -146,35 +113,29 @@ titer_alerts = dbc.Row(
 results_layout = html.Div(
     children=[
         titer_alerts,
+        # Top row: sweep plots and the optimal process summary. They share one
+        # row, so the three cards (h-100) stretch to the same height.
+        dbc.Row(
+            [
+                D_range_card,
+                Contour_card,
+                dbc.Col(id="optimal_summary_container", md=4),
+            ],
+            className="px-4 pt-3",
+        ),
+        # Bottom row: time evolution plots and the selected process summary
         dbc.Row(
             [
                 dbc.Col(
-                    [
-                        # Top row with sweep plots
-                        dbc.Row(
-                            [D_range_card, Contour_card],
-                            className="justify-content-center",
-                        ),
-                        # Bottom row with time evolution plots
-                        dbc.Row(
-                            [time_evolution_card_onestage, time_evolution_card_cascade],
-                            className="mt-4",
-                        ),
-                    ],
+                    dbc.Row(
+                        [time_evolution_card_onestage, time_evolution_card_cascade],
+                        className="h-100",
+                    ),
                     md=8,
                 ),
-                # RIGHT SECTION (process summary)
-                dbc.Col(
-                    [
-                        html.H5(className="card-title"),
-                        html.Div(
-                            id="summary_card_container",
-                        ),
-                    ],
-                    md=4,
-                ),
+                dbc.Col(id="selected_summary_container", md=4),
             ],
-            className="px-4 pb-4 pt-3",
+            className="px-4 pb-4 mt-4",
         ),
     ],
 )

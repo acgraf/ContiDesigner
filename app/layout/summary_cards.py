@@ -42,7 +42,7 @@ def metric_row(
                 className="text-end",
             ),
         ],
-        className="my-1",
+        className="my-0",
     )
     tooltip_comp = (
         dbc.Tooltip(tooltip, target=row_id, placement="right") if tooltip else None
@@ -203,9 +203,9 @@ def summarize_process(
                                 tooltip=tooltips["product_concentration"],
                                 row_id=f"{prefix}_product_concentration",
                             ),
-                            html.Hr(className="my-2"),
+                            html.Hr(className="my-1"),
                         ],
-                        className="mb-3",
+                        className="mb-2",
                     ),
                     html.Div(
                         [
@@ -230,9 +230,9 @@ def summarize_process(
                                 tooltip=tooltips["yield"],
                                 row_id=f"{prefix}_yield",
                             ),
-                            html.Hr(className="my-2"),
+                            html.Hr(className="my-1"),
                         ],
-                        className="mb-3",
+                        className="mb-2",
                     ),
                     html.Div(
                         [
@@ -274,15 +274,15 @@ def summarize_process(
                                 row_id=f"{prefix}_dilution_rate",
                                 decimals=3,
                             ),
-                            html.Hr(className="my-2"),
+                            html.Hr(className="my-1"),
                         ],
-                        className="mb-3",
+                        className="mb-2",
                     ),
                     html.Div(
                         [
                             html.H6(
                                 "Export & Downloads",
-                                className="text-muted fw-bold mtb-1",
+                                className="text-muted fw-bold mt-1",
                                 style={"color": "#333"},
                             ),
                             dbc.Row(
@@ -294,11 +294,14 @@ def summarize_process(
                                 className="g-4 mb-0 justify-content-center",
                             ),
                         ],
+                        # downloads at the bottom, level with the sweep cards' buttons
+                        className="mt-auto",
                     ),
                 ],
+                className="d-flex flex-column",
             ),
         ],
-        className="shadow-sm mb-4",
+        className="shadow-sm h-100",
     )
 
     summary_data = {
@@ -311,6 +314,8 @@ def summarize_process(
         "product_cascade": pp2,
         "productivity_onestage": prod1,
         "productivity_cascade": prod_cascade,
+        "yield_onestage": Yield_OS,
+        "yield_cascade": Yield_TS,
         "feed_rate": model.F_total,
         "feed_rate_stages": [model.F1, model.F1 + model.F2],
         "volume": model.V_total,

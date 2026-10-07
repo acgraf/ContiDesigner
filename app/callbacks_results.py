@@ -254,7 +254,8 @@ def register_callbacks_results(app):
 
 
     @app.callback(
-        Output("summary_card_container", "children"),
+        Output("optimal_summary_container", "children"),
+        Output("selected_summary_container", "children"),
         Input("optimal_summary_card_store", "data"),
         Input("selected_summary_card_store_D_range", "data"),
         Input("selected_summary_card_store_contour", "data"),
@@ -268,12 +269,7 @@ def register_callbacks_results(app):
             selected_card = selected_card_contour
         else:
             selected_card = None
-        cards_to_show = []
-        if opt_card:
-            cards_to_show.append(opt_card)
-        if selected_card:
-            cards_to_show.append(selected_card)
-        return cards_to_show
+        return opt_card or None, selected_card or None
 
 
     @app.callback(
