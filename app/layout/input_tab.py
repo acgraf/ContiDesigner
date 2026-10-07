@@ -367,6 +367,22 @@ checkbox_growth_s2 = dbc.Col(
     md=12,
 )
 
+checkbox_fine_D_grid = dbc.Col(
+    [
+        dbc.Checkbox(
+            id="fine_D_grid",
+            value=False,
+            label="Fine grid (more steps; slower)",
+        ),
+        dbc.Tooltip(
+            tooltips["fine_D_grid"],
+            target="fine_D_grid",
+            placement="right",
+        ),
+    ],
+    width="auto",
+)
+
 toggle_substrate_inhibition = dbc.Col(
     [
         dbc.Switch(
@@ -575,13 +591,18 @@ Clear_button = dbc.Col(
     width="auto",
 )
 
-buttons_row = dbc.Row(
+buttons_row = html.Div(
     [
-        Submit_button,
-        Defaults_button,
-        Clear_button,
-    ],
-    className="justify-content-center",
+        dbc.Row(checkbox_fine_D_grid, className="justify-content-center mb-2"),
+        dbc.Row(
+            [
+                Submit_button,
+                Defaults_button,
+                Clear_button,
+            ],
+            className="justify-content-center",
+        ),
+    ]
 )
 left_params_card = dbc.Col(
     [card_outer, buttons_row],

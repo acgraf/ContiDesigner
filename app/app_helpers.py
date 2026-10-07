@@ -128,4 +128,5 @@ INPUT_MAP = {
     "is_biomass_inhibited": "is_biomass_inhibited",
     "is_product_inhibited": "is_product_inhibited",
     "titer_min": "titer_min",
+    "fine_D_grid": "fine_D_grid",
 }

@@ -476,9 +476,10 @@ class ContiModel:
             self._set_params(self.params)
 
     def dilution_range_D(self, norm=False):
-        # set a linspace of dilution rates from 0 to 1,
+        # set a linspace of dilution rates from 0 to 1 in steps of D_step,
         # that will be limited by the maximum dilution rate
-        D_range = np.linspace(0, 1, 201)
+        D_step = self.params.get("D_step") or 0.01
+        D_range = np.linspace(0, 1, int(round(1 / D_step)) + 1)
         mu_eff = self.limit_rate(self.mu_max, [0, self.sf1, 0])
         D_max = mu_eff - self.delta
         if D_max < 0:
@@ -493,7 +494,8 @@ class ContiModel:
         ## D_max, the washout bound of the one-stage reference, but a different
         ## constraint: D1 = phi / (1 - ny) * D_total can be above or below D_total
         buffer = 0  # 0.15
-        D_range = np.linspace(0, 1, 101)
+        D_step = self.params.get("D_step") or 0.01
+        D_range = np.linspace(0, 1, int(round(1 / D_step)) + 1)
         mu_eff = self.limit_rate(self.mu_max, [0, self.sf1, 0])
         D1_max_total = mu_eff - self.delta
         D1_max = D1_max_total * (

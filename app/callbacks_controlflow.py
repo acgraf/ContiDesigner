@@ -124,6 +124,7 @@ def register_callbacks_controlflow(app):
             "is_substrate_inhibited",
             "is_biomass_inhibited",
             "is_product_inhibited",
+            "fine_D_grid",
         ]
         # Reset all inputs when Clear button is clicked
         if triggered == "clear_btn":
@@ -165,7 +166,9 @@ def register_callbacks_controlflow(app):
             # no feasible process (minimum titer not reached)
             return "One-stage process", "Two-stage process"
         onestage_header = f"One-stage process (D= {D:.3f} /h)"
-        cascade_header = f"Two-stage process (D= {D:.3f} /h, Φ = {phi:.2f}, ν= {ny:.2f})"
+        cascade_header = (
+            f"Two-stage process (D= {D:.3f} /h, Φ = {phi:.2f}, ν= {ny:.2f})"
+        )
         return onestage_header, cascade_header
 
     # this function needs a callback, so the params store
@@ -194,6 +197,7 @@ def register_callbacks_controlflow(app):
         is_substrate_inhibited = bool(vals["is_substrate_inhibited"])
         is_biomass_inhibited = bool(vals["is_biomass_inhibited"])
         is_product_inhibited = bool(vals["is_product_inhibited"])
+        fine_D_grid = bool(vals["fine_D_grid"])
 
         params_dict = {
             "mu_max": f("mu_max"),
@@ -225,6 +229,9 @@ def register_callbacks_controlflow(app):
             "is_biomass_inhibited": is_biomass_inhibited,
             "is_product_inhibited": is_product_inhibited,
             "titer_min": f("titer_min"),
+            "fine_D_grid": fine_D_grid,
+            "D_step": 0.005 if fine_D_grid else 0.01,
+            "phi_ny_step": 0.01 if fine_D_grid else 0.02,
             "t_span": np.linspace(0, 100, 201),
         }
         return params_dict
@@ -264,7 +271,7 @@ def register_callbacks_controlflow(app):
 
         for key, cur_class in zip(app_helpers.INPUT_MAP.keys(), current_classes):
             # skip optional parameters
-            if key.endswith("_inhibited") or key.endswith("growth_stage2"):
+            if key.endswith("_inhibited") or key in ("growth_stage2", "fine_D_grid"):
                 new_classes.append(no_update)
             elif key in missing_inputs:
                 new_classes.append("form-control-sm border-1 shadow-sm is-invalid")

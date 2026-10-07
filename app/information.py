@@ -26,6 +26,7 @@ tooltips = {
     "Ki": "Substrate inhibition constant (Haldane)",
     # --- Checkboxes ---
     "growth_stage2_checkbox": "Enable growth during the production (Stage 2) phase.",
+    "fine_D_grid": "Scan the total dilution rate in steps of 0.005 /h instead of 0.01 /h, and φ and ν in steps of 0.01 instead of 0.02.",
     "calculation_checkbox": "Switch between analytical and numerical solution methods.",
     "is_substrate_inhibited": "Enable substrate inhibition w/ an additional inhibition term",
     "is_biomass_inhibited": "Enable biomass inhibition w/ a max biomass concentration.",

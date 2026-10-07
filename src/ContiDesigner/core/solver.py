@@ -285,12 +285,9 @@ class Solver:
         return self.sweep("D_total", self.model.D_values[1:])
 
     def steady_state_across_phi_ny(self):
-        return self.sweep(
-            "phi",
-            np.arange(0.01, 1.01, 0.02),
-            "ny",
-            np.arange(0.01, 1.01, 0.02),
-        )
+        step = self.model.params.get("phi_ny_step") or 0.02
+        grid = np.arange(0.01, 1.01, step)
+        return self.sweep("phi", grid, "ny", grid)
 
     def find_optimum_D_total(self, max_param="X_onestage"):
         if max_param not in [
