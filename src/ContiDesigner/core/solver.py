@@ -81,14 +81,16 @@ class Solver:
         # if the calculated sf2lim is negative, set it to zero
         # this can be the case little need for substrate and theres a lot of substrate
         # coming from stage 1 (high F1)
-        # add 5% as a safety buffer, so the substrate steady state cannot go below zero
+        # add 5% as a safety buffer, so the substrate steady state cannot go below zero.
+        # The buffer is not clipped: a buffered feed above sf2_max makes the design
+        # point infeasible (checked by the caller), so the buffer holds at the cap too.
 
         if np.isclose(sf2lim, 0) or sf2lim < 0:
             return 0
 
-        sf2lim = min(sf2lim, sf2_max)
         sf2lim_buffered = sf2lim * 1.05
-        sf2lim_buffered = min(sf2lim_buffered, sf2_max)
+        if sf2lim_buffered > sf2_max:
+            return sf2lim_buffered
 
         self.model.numeric_input_params["sf2"] = sf2lim_buffered
 
@@ -192,7 +194,8 @@ class Solver:
                 return [np.nan] * (3 * self.model.N_reactors)
             lam1 = stability.dominant_eigenvalue(self.model, [x1, s1, p1], stage=1)
             self.last_lambda1 = lam1
-            if not stability.is_robust(lam1, D=self.model.D1):
+            D1 = self.model.D1 if self.model.N_reactors == 2 else self.model.Ds[0]
+            if not stability.is_robust(lam1, D=D1):
                 return [np.nan] * (3 * self.model.N_reactors)
 
             states = [x1, s1, p1]
@@ -201,6 +204,12 @@ class Solver:
                 x_new = self.calculate_x2(x1=x_prev, i=i)
                 p_new = self.calculate_p2(x1=x_prev, p1=p_prev, i=i)
                 sf_new = self.min_sf2(x2=x_new, s1=s_prev, i=i)
+                if sf_new > self.model.sf2_max:
+                    if self.model.N_reactors == 2:
+                        # stage 2 would need more than sf2_max (incl. buffer)
+                        self.model.sf2 = self.model.sf2_max
+                        return [np.nan] * (3 * self.model.N_reactors)
+                    sf_new = self.model.sf2_max  # N > 2: S2 set to 0 below if short
                 self.model.sf2 = sf_new
                 s_new = self.calculate_s2(x1=x_prev, s1=s_prev, i=i)
                 EPS = 1e-8
@@ -281,12 +290,46 @@ class Solver:
             "delta_STY_D": delta_STY_D,
         }
 
+    def _onestage_feasible(self, D):
+        with self.model.temporary_params({"D_total": float(D)}):
+            return bool(np.all(np.isfinite(self.calculate_steady_states(cascade=False))))
+
+    def stable_D_max(self, n_bisect=40):
+        """
+        Largest D_total at which the one-stage steady state is feasible,
+        including the stability check. Below the washout bound D_max: the
+        relative criterion (lambda_max < -0.2 D) rejects the band near washout.
+        Both processes are compared over D_total <= stable_D_max; the cascade
+        could run beyond it (D1 < D_total), but there is no one-stage
+        reference there. NaN if no grid point is feasible.
+        """
+        D_grid = self.model.D_values[1:]
+        ok = [self._onestage_feasible(D) for D in D_grid]
+        if not any(ok):
+            return np.nan
+        i = max(k for k, v in enumerate(ok) if v)
+        lo = D_grid[i]
+        hi = D_grid[i + 1] if i + 1 < len(D_grid) else self.model.D_max
+        for _ in range(n_bisect):
+            mid = 0.5 * (lo + hi)
+            if self._onestage_feasible(mid):
+                lo = mid
+            else:
+                hi = mid
+        return float(lo)
+
+    def stable_D_values(self):
+        """The D_total grid (without D = 0) limited to stable_D_max."""
+        D_grid = self.model.D_values[1:]
+        return D_grid[D_grid <= self.stable_D_max()]
+
     def steady_state_across_D(self):
-        return self.sweep("D_total", self.model.D_values[1:])
+        return self.sweep("D_total", self.stable_D_values())
 
     def steady_state_across_phi_ny(self):
         step = self.model.params.get("phi_ny_step") or 0.02
         grid = np.arange(0.01, 1.01, step)
+        grid = grid[grid < 1 - 1e-9]  # 0 < phi, ny < 1 (arange can reach or pass 1)
         return self.sweep("phi", grid, "ny", grid)
 
     def find_optimum_D_total(self, max_param="X_onestage"):
@@ -366,7 +409,7 @@ class Solver:
         results = []
 
         # Loop through each D_total value
-        for D_val in self.model.D_values[1:]:
+        for D_val in self.stable_D_values():
             with self.model.temporary_params({"D_total": D_val}):
                 # Optimize phi, ny for this D_total
                 phi_opt, ny_opt, phi_ny_grid, rel_improv = self.find_optimum_phi_ny(
@@ -473,10 +516,13 @@ class Solver:
     def optimize_onestage_continuous(self, n_scan=60):
         """
         Exact STY optimum of the one-stage process (not used by the app).
-        Scan of D up to D_max, then a bounded 1-D search around the best point.
-        Returns a dict with D_opt and STY_onestage (NaN if nothing is feasible).
+        Scan of D up to stable_D_max, then a bounded 1-D search around the best
+        point. Returns a dict with D_opt and STY_onestage (NaN if nothing is
+        feasible).
         """
-        D_max = self.model.D_max
+        D_max = self.stable_D_max()
+        if not np.isfinite(D_max):
+            return {"D_opt": np.nan, "STY_onestage": np.nan}
 
         def neg_sty(D):
             with self.model.temporary_params({"D_total": float(D)}):
@@ -504,14 +550,14 @@ class Solver:
 
         Nelder-Mead over (D_total, phi, ny), started from x0 = (D, phi, ny) or,
         if x0 is None, from the grid optimum of optimize_phi_ny_across_D. Uses
-        the same feasibility rules as the grid: D_total <= D_max, D1 <= D1_max,
+        the same feasibility rules as the grid: D_total <= stable_D_max, D1 <= D1_max,
         and a steady state that passes the stability check, with P2 >= 0.
         Returns a dict with D_opt, phi_opt, ny_opt, STY_cascade, and the grid
         start point.
         """
         if self.model.N_reactors != 2:
             raise ValueError("optimize_cascade_continuous supports two stages only")
-        D_max, D1_max = self.model.D_max, self.model.D1_max
+        D_max, D1_max = self.stable_D_max(), self.model.D1_max
 
         def neg_sty(x):
             D, phi, ny = map(float, x)

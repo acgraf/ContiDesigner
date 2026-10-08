@@ -1,7 +1,7 @@
 from sqlite3 import Row
 from dash import dcc, html
 import dash_bootstrap_components as dbc
-from ContiDesigner.utils.defaults import DEFAULT_PROCESS_INFO, DEFAULT_PROCESSES 
+from ContiDesigner.utils.defaults import DEFAULT_PROCESS_INFO, DEFAULT_PROCESSES
 from app.layout.helper import labels
 from app.information import tooltips
 
@@ -744,7 +744,7 @@ input_layout = html.Div(
                 defaults_modal,
                 wait_modal,
             ],
-            fluid=True, 
+            fluid=True,
         ),
     ],
 )
