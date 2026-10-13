@@ -66,9 +66,8 @@ class Solver:
             phi, ny = self.model.phis[i], self.model.nys[i]
             mu_s2 = self.model.mu_s2[i - 1]
         D_total = self.model.D_total
-        sf2_max = self.model.sf2_max
         numerator = (
-            helpers.save_divide(self.model.m_2, self.model.Yas_2)
+            helpers.save_divide(self.model.rho_2, self.model.Yas_2)
             + helpers.save_divide(mu_s2, self.model.Yxs_2)
             + helpers.save_divide(
                 self.model.pi0_s2 + mu_s2 * self.model.pi1_s2,
@@ -88,37 +87,12 @@ class Solver:
         if np.isclose(sf2lim, 0) or sf2lim < 0:
             return 0
 
-        sf2lim_buffered = sf2lim * 1.05
-        if sf2lim_buffered > sf2_max:
-            return sf2lim_buffered
-
-        self.model.numeric_input_params["sf2"] = sf2lim_buffered
-
-        return sf2lim_buffered
+        return sf2lim * 1.05
     
-    def calculate_steady_states_norm(self, cascade=True):
-        if cascade == False:
-            x1 = self.calculate_x_OS_norm()
-            s1 = self.calculate_s_OS_norm()
-            p1 = self.calculate_p_OS_norm(x1=x1)
-            return [x1, s1, p1]
-        else:
-            if np.isnan(self.model.D1) or np.isnan(self.model.D2):
-                return [np.nan] * 6
-            x1 = self.calculate_x1_norm()
-            s1 = self.calculate_s1_norm()
-            p1 = self.calculate_p1_norm(x1=x1)
-            x2 = self.calculate_x2_norm(x1=x1)
-            p2 = self.calculate_p2_norm(x1=x1, p1=p1)
-            s2 = self.calculate_s2_norm(x1=x1, s1=s1)
-            return [x1, s1, p1, x2, s2, p2]  # , [0,0]
-
-    def calculate_steady_states(self, cascade=True):
+    def calculate_steady_states(self, onestage=False):
         N = self.model.N_reactors
 
-        if self.model.norm == True:
-            return self.calculate_steady_states_norm(cascade=cascade)
-        if cascade == False:
+        if onestage:
             if self.model.is_substrate_inhibited:
                 x1 = self.calculate_x_OS_SI()
                 s1 = self.calculate_s_OS_SI()
@@ -142,13 +116,15 @@ class Solver:
                 # fallback to ODE integration if invalid
                 if not sol_onestage.success:  # or (x1 < 1e-12):
                     y = self.model.simulate_process(
-                        cascade=False, steady_state=True, return_trajectory=False
+                        onestage=True, steady_state=True, return_trajectory=False
                     )
                     x1, s1, p1 = y[:3]
             if not np.isfinite(s1) or s1 < 0:
                 return [np.nan] * 3
-            # on the refined state, as for the cascade below
-            lam = stability.dominant_eigenvalue(self.model, [x1, s1, p1], stage=1)
+            # on the refined state, as for the two-stage process below
+            lam = stability.dominant_eigenvalue(
+                self.model, [x1, s1, p1], stage=1, onestage=True
+            )
             self.last_lambda1 = lam
             if not stability.is_robust(lam, D=self.model.D_total):
                 return [np.nan] * 3
@@ -176,15 +152,15 @@ class Solver:
                 guess2 = [max(i, 1e-6) for i in guess2]
 
                 def F2(state):
-                    return self.model.cascade_ODEs(0, state)
+                    return self.model.two_stage_ODEs(0, state)
 
-                sol_cascade = root(F2, guess2, method="hybr")
-                x1, s1, p1 = sol_cascade.x
+                sol_twostage = root(F2, guess2, method="hybr")
+                x1, s1, p1 = sol_twostage.x
                 if x1 > 1e-4:
                     self._last_ss = [x1, s1, p1]
-                if not sol_cascade.success:  # or (x1 < 1e-12):
+                if not sol_twostage.success:  # or (x1 < 1e-12):
                     y = self.model.simulate_process(
-                        cascade=True,
+                        onestage=False,
                         steady_state=True,
                         only_stage1=True,
                         return_trajectory=False,
@@ -250,17 +226,17 @@ class Solver:
         steady_states = self.calculate_steady_states()
         xx, ss, pp, xx2, ss2, pp2 = steady_states
         xx_onestage, ss_onestage, pp_onestage = self.calculate_steady_states(
-            cascade=False
+            onestage=True
         )
 
         STY_1 = self.calculate_STY(pp, self.model.D1)
         STY_2 = self.calculate_STY(pp2, self.model.D2)
         STY_onestage = self.calculate_STY(pp_onestage, self.model.D_total)
         if np.isnan(self.model.D2):
-            STY_cascade = np.nan
+            STY_twostage = np.nan
         else:
-            STY_cascade = self.calculate_STY(pp2, self.model.D_total)
-        delta_STY_D = self.calculate_delta_STY_D(STY_onestage, STY_cascade)
+            STY_twostage = self.calculate_STY(pp2, self.model.D_total)
+        delta_STY_D = self.calculate_delta_STY_D(STY_onestage, STY_twostage)
 
         return {
             "D1": self.model.D1,
@@ -279,7 +255,7 @@ class Solver:
             "sf2_min": self.model.sf2,
             "phi": self.model.phi,
             "ny": self.model.ny,
-            "STY_cascade": STY_cascade,
+            "STY_twostage": STY_twostage,
             "D_total": self.model.D_total,
             "V_total": self.model.V_total,
             "X_onestage": xx_onestage,
@@ -292,14 +268,14 @@ class Solver:
 
     def _onestage_feasible(self, D):
         with self.model.temporary_params({"D_total": float(D)}):
-            return bool(np.all(np.isfinite(self.calculate_steady_states(cascade=False))))
+            return bool(np.all(np.isfinite(self.calculate_steady_states(onestage=True))))
 
     def stable_D_max(self, n_bisect=40):
         """
         Largest D_total at which the one-stage steady state is feasible,
         including the stability check. Below the washout bound D_max: the
         relative criterion (lambda_max < -0.2 D) rejects the band near washout.
-        Both processes are compared over D_total <= stable_D_max; the cascade
+        Both processes are compared over D_total <= stable_D_max; the two-stage process
         could run beyond it (D1 < D_total), but there is no one-stage
         reference there. NaN if no grid point is feasible.
         """
@@ -358,7 +334,7 @@ class Solver:
         return param_max, D_optimum, steady_states
 
     def find_optimum_phi_ny(
-        self, max_D=None, max_param="STY_cascade", secondary_param="X_onestage",
+        self, max_D=None, max_param="STY_twostage", secondary_param="X_onestage",
         p_min=None,
     ):
         """
@@ -392,19 +368,19 @@ class Solver:
         return phi_param_max, ny_param_max, steady_states, delta_STY_D
 
     def optimize_phi_ny_across_D(
-        self, max_param="STY_cascade", secondary_param="X1", tol=0.01, p_min=None
+        self, max_param="STY_twostage", secondary_param="X1", tol=0.01, p_min=None
     ):
         """
         Sweep across D_total values, and for each, optimize phi and ny
-        to maximize the given max_param (default STY_cascade).
+        to maximize the given max_param (default STY_twostage).
         With p_min (minimum product titer, g/L), only (phi, ny) with P2 >= p_min
         are considered; D_total values where none qualifies keep the
         unconstrained optimum with titer_ok = False and are not candidates
         for D_opt, which is NaN if no D_total qualifies. P2_max is the highest
-        P2 of a feasible cascade at each D_total.
+        P2 of a feasible two-stage process at each D_total.
         Returns a DataFrame with:
             D_total, X_onestage, S_onestage, P_onestage,
-            phi_opt, ny_opt, X2_opt, S2_opt, P2_opt, STY_cascade_opt
+            phi_opt, ny_opt, X2_opt, S2_opt, P2_opt, STY_twostage_opt
         """
         results = []
 
@@ -420,7 +396,7 @@ class Solver:
                 if not (np.isfinite(phi_opt) and np.isfinite(ny_opt)):
                     if p_min is None or not np.isfinite(phi_ny_grid[max_param]).any():
                         continue          # skip this D_total
-                    # feasible cascades exist, but none reaches the titer:
+                    # feasible two-stage designs exist, but none reaches the titer:
                     # keep the unconstrained optimum, flagged by titer_ok
                     best_state = phi_ny_grid.loc[phi_ny_grid[max_param].idxmax()]
                     phi_opt, ny_opt = best_state["phi"], best_state["ny"]
@@ -431,14 +407,14 @@ class Solver:
                     X1, S1, P1, X2, S2, P2 = steady_states
 
                     # Also compute the onestage steady states
-                    steady_states_onestage = self.calculate_steady_states(cascade=False)
+                    steady_states_onestage = self.calculate_steady_states(onestage=True)
                     X_onestage, S_onestage, P_onestage = steady_states_onestage
 
-                    # Compute STY_cascade for consistency
+                    # Compute STY_twostage for consistency
                     STY_onestage = self.calculate_STY(P_onestage, self.model.D_total)
                     STY_1 = self.calculate_STY(P1, self.model.D1)
                     STY_2 = self.calculate_STY(P2, self.model.D2)
-                    STY_cascade = self.calculate_STY(P2, self.model.D_total)
+                    STY_twostage = self.calculate_STY(P2, self.model.D_total)
 
                     DX_onestage = self.calculate_STY(X_onestage, self.model.D_total)
                     D1X1 = self.calculate_STY(X1, self.model.D1)
@@ -464,7 +440,7 @@ class Solver:
                         "X2_opt": X2,
                         "S2_opt": S2,
                         "P2_opt": P2,
-                        "STY_cascade": STY_cascade,
+                        "STY_twostage": STY_twostage,
                         "STY_1": STY_1,
                         "STY_2": STY_2,
                     }
@@ -485,20 +461,20 @@ class Solver:
             if candidates.empty:
                 return df, np.nan, np.nan
             onestage_ok = candidates[candidates["P_onestage"] >= p_min]
-            D_opt_cascade = candidates.loc[candidates["STY_cascade"].idxmax(), "D_total"]
-            STY_cascade_max = candidates["STY_cascade"].max()
-            if not onestage_ok.empty and STY_cascade_max <= onestage_ok[
+            D_opt_twostage = candidates.loc[candidates["STY_twostage"].idxmax(), "D_total"]
+            STY_twostage_max = candidates["STY_twostage"].max()
+            if not onestage_ok.empty and STY_twostage_max <= onestage_ok[
                 "STY_onestage"
             ].max() * (1 + tol):
                 D_opt = onestage_ok.loc[onestage_ok["STY_onestage"].idxmax(), "D_total"]
             else:
-                D_opt = D_opt_cascade
-            return df, D_opt, STY_cascade_max
+                D_opt = D_opt_twostage
+            return df, D_opt, STY_twostage_max
 
-        # Identify best D_total according to STY_cascade
-        best_D_total_idx = df["STY_cascade"].idxmax()
-        D_opt_cascade = df.loc[best_D_total_idx]["D_total"]
-        STY_cascade_max = df.loc[best_D_total_idx]["STY_cascade"]
+        # Identify best D_total according to STY_twostage
+        best_D_total_idx = df["STY_twostage"].idxmax()
+        D_opt_twostage = df.loc[best_D_total_idx]["D_total"]
+        STY_twostage_max = df.loc[best_D_total_idx]["STY_twostage"]
 
         # Identify best D_total according to STY_onestage
         best_D_onestage_idx = df["STY_onestage"].idxmax()
@@ -506,12 +482,12 @@ class Solver:
         STY_onestage_max = df.loc[best_D_onestage_idx]["STY_onestage"]
 
         # Apply the “2-stage gives no benefit” rule
-        if STY_cascade_max <= STY_onestage_max * (1 + tol):
+        if STY_twostage_max <= STY_onestage_max * (1 + tol):
             D_opt = D_opt_onestage
         else:
-            D_opt = D_opt_cascade
+            D_opt = D_opt_twostage
 
-        return df, D_opt, STY_cascade_max
+        return df, D_opt, STY_twostage_max
 
     def optimize_onestage_continuous(self, n_scan=60):
         """
@@ -526,7 +502,7 @@ class Solver:
 
         def neg_sty(D):
             with self.model.temporary_params({"D_total": float(D)}):
-                P = self.calculate_steady_states(cascade=False)[2]
+                P = self.calculate_steady_states(onestage=True)[2]
             return -D * P if np.isfinite(P) and P >= 0 else np.inf
 
         Ds = np.linspace(D_max / n_scan, D_max * 0.999, n_scan)
@@ -543,20 +519,20 @@ class Solver:
         D_opt, f = (r.x, r.fun) if r.fun < vals[i] else (Ds[i], vals[i])
         return {"D_opt": float(D_opt), "STY_onestage": float(-f)}
 
-    def optimize_cascade_continuous(self, x0=None):
+    def optimize_twostage_continuous(self, x0=None):
         """
-        Exact STY optimum of the two-stage cascade (not used by the app, which
+        Exact STY optimum of the two-stage process (not used by the app, which
         keeps the grid of optimize_phi_ny_across_D).
 
         Nelder-Mead over (D_total, phi, ny), started from x0 = (D, phi, ny) or,
         if x0 is None, from the grid optimum of optimize_phi_ny_across_D. Uses
         the same feasibility rules as the grid: D_total <= stable_D_max, D1 <= D1_max,
         and a steady state that passes the stability check, with P2 >= 0.
-        Returns a dict with D_opt, phi_opt, ny_opt, STY_cascade, and the grid
+        Returns a dict with D_opt, phi_opt, ny_opt, STY_twostage, and the grid
         start point.
         """
         if self.model.N_reactors != 2:
-            raise ValueError("optimize_cascade_continuous supports two stages only")
+            raise ValueError("optimize_twostage_continuous supports two stages only")
         D_max, D1_max = self.stable_D_max(), self.model.D1_max
 
         def neg_sty(x):
@@ -570,8 +546,8 @@ class Solver:
             return -D * P2 if np.isfinite(P2) and P2 >= 0 else np.inf
 
         if x0 is None:
-            df = self.optimize_phi_ny_across_D(max_param="STY_cascade")[0]
-            best = df.loc[df["STY_cascade"].idxmax()]
+            df = self.optimize_phi_ny_across_D(max_param="STY_twostage")[0]
+            best = df.loc[df["STY_twostage"].idxmax()]
             x0 = (best["D_total"], best["phi_opt"], best["ny_opt"])
         x0 = np.array(x0, float)
         f0 = neg_sty(x0)
@@ -589,7 +565,7 @@ class Solver:
             "D_opt": D,
             "phi_opt": phi,
             "ny_opt": ny,
-            "STY_cascade": float(-f),
+            "STY_twostage": float(-f),
             "start": tuple(map(float, x0)),
         }
 
@@ -597,15 +573,15 @@ class Solver:
         STY = p * D
         return STY
 
-    def calculate_delta_STY_D(self, STY_onestage, STY_cascade):
-        if np.isnan(STY_cascade) or np.isnan(STY_onestage):
+    def calculate_delta_STY_D(self, STY_onestage, STY_twostage):
+        if np.isnan(STY_twostage) or np.isnan(STY_onestage):
             return np.nan
         denom = max(abs(STY_onestage), 1e-12)
-        delta_STY_D = helpers.save_divide(STY_cascade, denom) - 1
+        delta_STY_D = helpers.save_divide(STY_twostage, denom) - 1
         return delta_STY_D
 
-    def total_substrate_consumed(self, ss_os=None, ss2=None, cascade=True):
-        if cascade:
+    def total_substrate_consumed(self, ss_os=None, ss2=None, onestage=False):
+        if not onestage:
             S_in = (
                 self.model.F1 * self.model.sf_onestage + self.model.F2 * self.model.sf2
             )
@@ -617,14 +593,14 @@ class Solver:
             S_consumed = S_in - S_out
         return S_consumed
 
-    def calculate_yield(self, p_out, s_out, cascade=True):
+    def calculate_yield(self, p_out, s_out, onestage=False):
         """Product yield on consumed substrate in g/g.
 
         Product flow (P_out * F, g/h) divided by substrate consumption (g/h).
         """
         product_flow = p_out * self.model.F_total
-        if cascade:
-            s_consumed = self.total_substrate_consumed(ss2=s_out, cascade=True)
+        if not onestage:
+            s_consumed = self.total_substrate_consumed(ss2=s_out, onestage=False)
         else:
-            s_consumed = self.total_substrate_consumed(ss_os=s_out, cascade=False)
+            s_consumed = self.total_substrate_consumed(ss_os=s_out, onestage=True)
         return helpers.save_divide(product_flow, s_consumed)

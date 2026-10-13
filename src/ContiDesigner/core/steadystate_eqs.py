@@ -15,7 +15,7 @@ def calculate_x_OS(model):
                     (model.pi0_s1 + (D_total + model.delta) * model.pi1_s1),
                     model.Yps_1,
                 )
-                + helpers.save_divide(model.m_1, model.Yas_1)
+                + helpers.save_divide(model.rho_1, model.Yas_1)
             )
             / D_total
         )
@@ -68,7 +68,7 @@ def calculate_x_OS_SI(model):
         * D_delta
         * (
             helpers.save_divide(D_delta, model.Yxs_1)
-            + helpers.save_divide(model.m_1, model.Yas_1)
+            + helpers.save_divide(model.rho_1, model.Yas_1)
             + helpers.save_divide((D_delta * model.pi1_s1 + model.pi0_s1), model.Yps_1)
         )
     )
@@ -99,7 +99,7 @@ def calculate_s_OS_SI(model):
     return ss
 
 
-# CASCADE
+# TWO-STAGE
 
 # with Michaelis Menten kinetics
 
@@ -126,7 +126,7 @@ def calculate_x1(model):
         * (
             (ny - 1)
             * (
-                helpers.save_divide(model.m_1, model.Yas_1)
+                helpers.save_divide(model.rho_1, model.Yas_1)
                 + helpers.save_divide(model.delta, model.Yxs_1)
                 + helpers.save_divide(
                     (pi0_s1 + model.delta * pi1_s1),
@@ -198,7 +198,7 @@ def calculate_x1_SI(model):
     D_phi = D_total * phi
     Dmax_delta = model.D_max + model.delta
     sigma_term = (
-        helpers.save_divide(model.m_1, model.Yas_1)
+        helpers.save_divide(model.rho_1, model.Yas_1)
         + helpers.save_divide(model.delta, model.Yxs_1)
         + helpers.save_divide(pi0_s1 + model.delta * pi1_s1, model.Yps_1)
     )
@@ -300,7 +300,7 @@ def calculate_s2(model, x1, s1, i=1):
         denominator = D_total + (model.delta - mu_s2) * ny
         numerator2 = (
             (
-                helpers.save_divide(model.m_2, model.Yas_2) * x1
+                helpers.save_divide(model.rho_2, model.Yas_2) * x1
                 + s1 * (mu_s2 - model.delta)
                 + x1
                 * (
@@ -324,7 +324,7 @@ def calculate_s2(model, x1, s1, i=1):
         numerator = s1 * (
             helpers.save_divide(D_total, ny) + model.delta
         ) - x1 * (
-            helpers.save_divide(model.m_2, model.Yas_2)
+            helpers.save_divide(model.rho_2, model.Yas_2)
             + helpers.save_divide(pi0_s2, model.Yps_2)
         )
         denominator = D_total + model.delta * ny

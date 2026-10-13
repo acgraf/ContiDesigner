@@ -11,11 +11,10 @@ class ContiModel:
 
     def __init__(self, params):
         self._model_initialized = False
-        self.norm = params.get("norm", False)
         self._set_params(params)
 
-    def cascade_ODEs(self, t, state):
-        return ODEs.cascade_ODEs(self, t, state)
+    def two_stage_ODEs(self, t, state):
+        return ODEs.two_stage_ODEs(self, t, state)
 
     def one_stage_ODEs(self, t, state):
         return ODEs.one_stage_ODEs(self, t, state)
@@ -71,7 +70,7 @@ class ContiModel:
             "Yxs_1",
             "Yps_1",
             "Yas_1",
-            "m_1",
+            "rho_1",
             "pi0_s1",
             "pi1_s1",
             "V_total",
@@ -106,7 +105,7 @@ class ContiModel:
                 "Yxs_2",
                 "Yps_2",
                 "Yas_2",
-                "m_2",
+                "rho_2",
                 "pi0_s2",
                 "pi1_s2",
                 "D_total",
@@ -318,24 +317,23 @@ class ContiModel:
             self._assign_param(numeric_params, "F_total", multistage_params["F_total"])
             self._assign_param(numeric_params, "D_total", multistage_params["D_total"])
         # Non-structural defaults (sf2, etc.) are always fine to assign
-        if not self.norm:
-            defaults = {
-                "stage2_mu_factor": 0.1,
-                "Yxs_2": self.Yxs_1,
-                "Yps_2": self.Yps_1,
-                "Yas_2": self.Yas_1,
-                "m_2": self.m_1,
-                "pi0_s2": self.pi0_s1,
-                "pi1_s2": self.pi1_s1,
-                "sf2": self.sf2_max,
-                "sf_onestage": self.sf1,
-                "n1": 0.5,
-                "n2": 0.5,
-            }
-            for k, v in defaults.items():
-                if k not in p or p[k] is None:
-                    p[k] = v
-                self._assign_param(numeric_params, k, float(p[k]))
+        defaults = {
+            "stage2_mu_factor": 0.1,
+            "Yxs_2": self.Yxs_1,
+            "Yps_2": self.Yps_1,
+            "Yas_2": self.Yas_1,
+            "rho_2": self.rho_1,
+            "pi0_s2": self.pi0_s1,
+            "pi1_s2": self.pi1_s1,
+            "sf2": self.sf2_max,
+            "sf_onestage": self.sf1,
+            "n1": 0.5,
+            "n2": 0.5,
+        }
+        for k, v in defaults.items():
+            if k not in p or p[k] is None:
+                p[k] = v
+            self._assign_param(numeric_params, k, float(p[k]))
 
         return numeric_params
 
@@ -454,7 +452,7 @@ class ContiModel:
                 setattr(self, f"pi0_s{i}", 0)
                 setattr(self, f"pi1_s{i}", 0)
             if Yas == 0:
-                setattr(self, f"m_{i}", 0)
+                setattr(self, f"rho_{i}", 0)
         if self.Yxs_2 == 0:
             self.mu_s2 = 0
 
@@ -475,7 +473,7 @@ class ContiModel:
             self.params = old_params
             self._set_params(self.params)
 
-    def dilution_range_D(self, norm=False):
+    def dilution_range_D(self):
         # set a linspace of dilution rates from 0 to 1 in steps of D_step,
         # that will be limited by the maximum dilution rate
         D_step = self.params.get("D_step") or 0.01
@@ -484,12 +482,10 @@ class ContiModel:
         D_max = mu_eff - self.delta
         if D_max < 0:
             D_max = 0
-        if norm:
-            D_max = D_max / self.mu_max
         D_values = D_range[D_range <= D_max]
         return D_max, D_values
 
-    def dilution_range_D1(self, norm=False):
+    def dilution_range_D1(self):
         ## washout bound of stage 1 (a chemostat fed with sf1). Same value as
         ## D_max, the washout bound of the one-stage reference, but a different
         ## constraint: D1 = phi / (1 - ny) * D_total can be above or below D_total
@@ -501,8 +497,6 @@ class ContiModel:
         D1_max = D1_max_total * (
             1 - buffer
         )  # add a buffer to avoid numerical issues at the limit
-        if norm:
-            D1_max = D1_max / self.mu_max
         D1_range = D_range[D_range <= D1_max]
         return D1_max, D1_range
 
@@ -551,7 +545,7 @@ class ContiModel:
 
     def simulate_process(
         self,
-        cascade=True,
+        onestage=False,
         steady_state=False,
         only_stage1=False,
         return_trajectory=True,
@@ -566,8 +560,8 @@ class ContiModel:
             odes = self.multi_stage_ODEs
             y0 = self.growth_initial_state.copy() + [0, 0, 0] * (self.N_reactors - 1)
         else:
-            odes = self.cascade_ODEs if cascade else self.one_stage_ODEs
-            if cascade and not only_stage1:
+            odes = self.one_stage_ODEs if onestage else self.two_stage_ODEs
+            if not onestage and not only_stage1:
                 y0 = self.initial_state.copy()
             else:
                 y0 = self.growth_initial_state.copy()

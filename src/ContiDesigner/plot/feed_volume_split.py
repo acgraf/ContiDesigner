@@ -26,16 +26,16 @@ def _plotter_STY():
 def _plotter_delta_STY_D():
     z = "delta_STY_D"
     cbarlabel = "(STY<sub>TS</sub> / STY<sub>OS</sub>) -1"
-    titlebase_contour = f"Two stage cascade design space for "
+    titlebase_contour = f"Two-stage design space for "
     hover = "ΔSTY"
     return z, cbarlabel, titlebase_contour, hover
 
 
-def _plotter_STY_cascade():
-    z = "STY_cascade"
+def _plotter_STY_twostage():
+    z = "STY_twostage"
     cbarlabel = ""
     titlebase_contour = f"D_total ="
-    hover = "STY_cascade"
+    hover = "STY_twostage"
     return z, cbarlabel, titlebase_contour, hover
 
 
@@ -48,7 +48,7 @@ def _plotter_contour_dispatch(contour):
     mapping = {
         "STY1": _plotter_STY(),
         "delta_STY_D": _plotter_delta_STY_D(),
-        "STY_cascade": _plotter_STY_cascade(),
+        "STY_twostage": _plotter_STY_twostage(),
     }
     return mapping[contour]
 
@@ -68,7 +68,7 @@ def plot_contour(
     ncontours : int
         Number of contour levels
     titer_min : float, optional
-        Minimum product titer; feasible cascades with P2 < titer_min are greyed
+        Minimum product titer; feasible two-stage designs with P2 < titer_min are greyed
         out and the P2 = titer_min isoline is drawn.
     """
     if Data is None:
@@ -134,7 +134,7 @@ def plot_contour(
 
     hover_text = np.array(
         [
-            f"{hover}={val:.3g}" if np.isfinite(val) else "Cascade is infeasible"
+            f"{hover}={val:.3g}" if np.isfinite(val) else "Two-stage process is infeasible"
             for val in z_grid.flat
         ]
     ).reshape(z_grid.shape)

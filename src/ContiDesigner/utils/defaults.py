@@ -9,7 +9,7 @@ DEFAULT_PROCESSES = {
         "pi0_s1": 0,
         "pi1_s1": 0.13,
         "pi0_s2": 0.23,
-        "m_1": 0.064,
+        "rho_1": 0.064,
         "sf1": 67,
         "V_total": 9,
         "sf2_max": 500,
@@ -25,7 +25,7 @@ DEFAULT_PROCESSES = {
         "pi0_s1": 0.02,
         "pi1_s1": 2.2,
         "pi0_s2": 0.02,
-        "m_1": 0,
+        "rho_1": 0,
         # it's anaerobic fermentation, so cell maintenance is coupled to
         # the production of lactic acid
         "sf1": 60,

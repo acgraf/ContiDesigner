@@ -83,10 +83,10 @@ def _plot_reactor(fig, row, col, t_span, X, S, P, STY=None, title="", show_legen
     return fig
 
 
-def plot_time_evolution(plotter, cascade=True):
+def plot_time_evolution(plotter, onestage=False):
     N = plotter.model.N_reactors
-    if cascade:
-        t_span, y = plotter.model.simulate_process(cascade=cascade, steady_state=True)
+    if not onestage:
+        t_span, y = plotter.model.simulate_process(onestage=onestage, steady_state=True)
         columns = []
         for i in range(N):
             stage = f"{i+1}"
@@ -161,7 +161,7 @@ def plot_time_evolution(plotter, cascade=True):
         )
 
     else:
-        t_span, y = plotter.model.simulate_process(cascade=False, steady_state=True)
+        t_span, y = plotter.model.simulate_process(onestage=True, steady_state=True)
 
         df = pd.DataFrame(y.T, columns=["X", "S", "P"], index=t_span)
         STY = df["P"] * plotter.model.D_total

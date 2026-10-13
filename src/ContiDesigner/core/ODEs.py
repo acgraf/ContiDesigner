@@ -161,7 +161,7 @@ def multi_stage_ODEs(model, t, state):
     return derivatives
 
 
-def cascade_ODEs(model, t, state):
+def two_stage_ODEs(model, t, state):
     """
     Defines the system of ODEs.
     Returns the rate of change of each state variable.

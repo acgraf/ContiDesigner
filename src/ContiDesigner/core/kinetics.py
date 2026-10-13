@@ -56,16 +56,16 @@ def sigma(model, i=1, mu=None, s=1):
         Yxs = model.Yxs_1
         Yps = model.Yps_1
         Yas = model.Yas_1
-        m = model.m_1
+        rho = model.rho_1
     else:
         Yxs = model.Yxs_2
         Yps = model.Yps_2
         Yas = model.Yas_2
-        m = model.m_2
+        rho = model.rho_2
     return (
         helpers.save_divide(mu, Yxs)
         + helpers.save_divide(production(model, i, mu, s), Yps)
-        + helpers.save_divide(m, Yas)
+        + helpers.save_divide(rho, Yas)
     )
 
 

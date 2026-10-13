@@ -13,7 +13,7 @@ def _plot_D_range_panel(
     X2,
     P2,
     STY,
-    STY_cascade,
+    STY_twostage,
     STY_2,
     phi,
     ny,
@@ -79,7 +79,7 @@ def _plot_D_range_panel(
     if titer_note is None:
         titer_note = [""] * len(D)
     custom_data = np.array(list(zip(phi, ny, titer_note)), dtype=object)
-    # CASCADE
+    # TWO-STAGE
     # biomass 2
     fig.add_trace(
         go.Scatter(
@@ -126,7 +126,7 @@ def _plot_D_range_panel(
     fig.add_trace(
         go.Scatter(
             x=D,
-            y=STY_cascade,
+            y=STY_twostage,
             mode="lines+markers",
             name="STY (Two-stage)",
             line=dict(color="red"),
@@ -204,8 +204,8 @@ def _add_titer_constraint(fig, D, titer_ok, titer_min):
 
 def plot_D_range(plotter, Data=None, titer_min=None):
     """
-    Plot steady-state figures (cascade or one-stage).
-    Cascade: two separate figures (growth + production reactors)
+    Plot steady-state figures (two-stage or one-stage).
+    Two-stage: two separate figures (growth + production reactors)
     One-stage: single figure.
     titer_min: optional minimum product titer; D_total values without a
     two-stage process reaching it are greyed out, the two-stage curves there
@@ -237,12 +237,12 @@ def plot_D_range(plotter, Data=None, titer_min=None):
         X2=conti_opt_ss["X2_opt"],
         P2=conti_opt_ss["P2_opt"],
         STY=conti_opt_ss["STY_onestage"],
-        STY_cascade=conti_opt_ss["STY_cascade"],
+        STY_twostage=conti_opt_ss["STY_twostage"],
         STY_2=conti_opt_ss["STY_2"],
         phi=conti_opt_ss["phi_opt"],
         ny=conti_opt_ss["ny_opt"],
         titer_note=titer_note,
-        title="Steady states across dilution rate + corresponding optimized cascade",
+        title="Steady states across dilution rate + corresponding optimized two-stage process",
         xlabel="Dilution rate [1/h]",
         xlim=[0, np.nanmax(conti_opt_ss["D_total"])],
         ylim=[
@@ -263,7 +263,7 @@ def plot_D_range(plotter, Data=None, titer_min=None):
             np.nanmax(
                 [
                     *conti_opt_ss["STY_onestage"],
-                    *conti_opt_ss["STY_cascade"],
+                    *conti_opt_ss["STY_twostage"],
                 ]
             )
             * 1.05,

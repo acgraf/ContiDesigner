@@ -6,8 +6,8 @@ class Plotter:
         self.model = model
         self.solver = solver
 
-    def plot_time_evolution(self, cascade=True):
-        return time_evolution.plot_time_evolution(self, cascade)
+    def plot_time_evolution(self, onestage=False):
+        return time_evolution.plot_time_evolution(self, onestage)
     
     def plot_D_range(self, Data=None, titer_min=None):
         return dilution_range.plot_D_range(self, Data, titer_min)

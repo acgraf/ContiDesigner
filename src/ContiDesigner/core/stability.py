@@ -1,7 +1,7 @@
 """
 Local stability analysis of steady states.
 
-The cascade is unidirectional (no recycle), so the stage-1 equations depend
+The two-stage process is unidirectional (no recycle), so the stage-1 equations depend
 only on stage-1 states. The full 6x6 Jacobian is therefore block lower
 triangular and its spectrum is the union of the spectra of J1 and J2. Each
 block can be analysed on its own.
@@ -72,14 +72,14 @@ def jacobian_fd(f, state):
     return J
 
 
-def stage1_jacobian_analytic(model, state):
+def stage1_jacobian_analytic(model, state, onestage=False):
     """
     Analytic stage-1 Jacobian. Base case only: Monod growth, no inhibition.
 
-    ODEs:
-        dx/dt = (mu - delta - D1) x
-        ds/dt = D1 (sf1 - s) - sigma x
-        dp/dt = (pi1 mu + pi0) x - D1 p
+    ODEs (D = D1 for stage 1 of the two-stage process, D_total for the one-stage process):
+        dx/dt = (mu - delta - D) x
+        ds/dt = D (sf - s) - sigma x
+        dp/dt = (pi1 mu + pi0) x - D p
     """
     if (
         model.is_substrate_inhibited
@@ -91,7 +91,7 @@ def stage1_jacobian_analytic(model, state):
             "use the finite-difference route"
         )
     x1, s1, _p1 = state
-    D1 = model.D1
+    D = model.D_total if onestage else model.D1
     mu = model.limit_rate(model.mu_max, state)
     sigma = model.sigma(0, mu, s1)
 
@@ -99,17 +99,17 @@ def stage1_jacobian_analytic(model, state):
     dsigma_ds = dmu_ds * (1.0 / model.Yxs_1 + model.pi1_s1 / model.Yps_1)
 
     J = np.zeros((3, 3))
-    J[0, 0] = mu - model.delta - D1
+    J[0, 0] = mu - model.delta - D
     J[0, 1] = dmu_ds * x1
     J[0, 2] = 0.0
 
     J[1, 0] = -sigma
-    J[1, 1] = -x1 * dsigma_ds - D1  # the -D1 dilution term
+    J[1, 1] = -x1 * dsigma_ds - D  # the -D dilution term
     J[1, 2] = 0.0
 
     J[2, 0] = model.pi0_s1 + mu * model.pi1_s1
     J[2, 1] = x1 * model.pi1_s1 * dmu_ds
-    J[2, 2] = -D1
+    J[2, 2] = -D
     return J
 
 
@@ -151,15 +151,20 @@ def _needs_fd(model):
     )
 
 
-def stage1_jacobian(model, state, force_fd=False):
-    """Stage-1 Jacobian, analytic where valid and finite-difference otherwise."""
+def stage1_jacobian(model, state, force_fd=False, onestage=False):
+    """
+    Stage-1 Jacobian, analytic where valid and finite-difference otherwise.
+    onestage=True: the one-stage process (dilution rate D_total), which must
+    not depend on the two-stage process' phi and ny.
+    """
     if force_fd or _needs_fd(model):
         check_smooth(model, state, _fd_step(state))
-        return jacobian_fd(lambda z: model.cascade_ODEs(0, list(z)), state)
-    return stage1_jacobian_analytic(model, state)
+        odes = model.one_stage_ODEs if onestage else model.two_stage_ODEs
+        return jacobian_fd(lambda z: odes(0, list(z)), state)
+    return stage1_jacobian_analytic(model, state, onestage=onestage)
 
 
-def dominant_eigenvalue(model, state, stage=1, force_fd=False):
+def dominant_eigenvalue(model, state, stage=1, force_fd=False, onestage=False):
     """
     Largest real part among the eigenvalues of the given stage's Jacobian.
 
@@ -172,7 +177,7 @@ def dominant_eigenvalue(model, state, stage=1, force_fd=False):
         return np.nan
     try:
         if stage == 1:
-            J = stage1_jacobian(model, state, force_fd=force_fd)
+            J = stage1_jacobian(model, state, force_fd=force_fd, onestage=onestage)
         else:
             J = stage2_jacobian_analytic(model, state)
     except (ClampedStateError, ValueError, ZeroDivisionError, FloatingPointError):
