@@ -13,7 +13,7 @@ cover +-3 steps of the previous level around its optimum (scope = local).
 Each level is compared with the continuous optimum (run continuous_optimum.py
 first).
 
-Outputs: grid_refinement.csv (figure: figures.py)
+Output: grid_refinement.csv
 """
 import time
 import numpy as np, pandas as pd

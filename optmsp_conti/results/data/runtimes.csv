@@ -1,0 +1,6 @@
+task,tool,seconds,n_evaluations
+"PHB two-stage default grid (D step 0.01, phi/nu step 0.02)",ContiDesigner optimize_phi_ny_across_D (closed form),14.57,57500
+"PHB two-stage default grid (D step 0.01, phi/nu step 0.02; D1 <= D1_max)","OptMSP brute force (LSODA, 3000 h each)",1277.22,43461
+PHB stage-1 stability diagnostics,port ODEs + finite-difference Jacobian,877.83,29379
+"PHB two-stage, continuous (D, phi, nu)",differential evolution on OptMSP-port ODEs (LSODA to steady state),1651.43,48292
+PHB two-stage grid via OptMSP Optimizer,"OptMSP Optimizer + pygmo IHS (2000 generations, pop 30)",376.11,10150

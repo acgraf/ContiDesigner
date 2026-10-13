@@ -1,0 +1,101 @@
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.01: 2449 modules, best STY 1.4197 (72 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.02: 2398 modules, best STY 2.3542 (145 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.03: 2347 modules, best STY 2.8438 (206 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.04: 2296 modules, best STY 3.1862 (274 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.05: 2245 modules, best STY 3.4225 (332 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.06: 2195 modules, best STY 3.4583 (399 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.07: 2143 modules, best STY 3.4882 (463 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.08: 2094 modules, best STY 3.4300 (523 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.09: 2042 modules, best STY 3.3630 (571 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.10: 1992 modules, best STY 3.2262 (618 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.11: 1941 modules, best STY 3.0867 (673 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.12: 1889 modules, best STY 2.9253 (716 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.13: 1840 modules, best STY 2.7475 (762 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.14: 1786 modules, best STY 2.5779 (815 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.15: 1736 modules, best STY 2.4306 (892 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.16: 1686 modules, best STY 2.3038 (960 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.17: 1637 modules, best STY 2.1909 (997 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.18: 1585 modules, best STY 2.0908 (1052 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.19: 1533 modules, best STY 2.0007 (1105 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.20: 1483 modules, best STY 1.9175 (1147 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.21: 1432 modules, best STY 1.8469 (1193 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.22: 1381 modules, best STY 1.7809 (1230 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+D=0.23: 1331 modules, best STY 1.7177 (1277 s)
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+[runtime] PHB two-stage paper grid (D step 0.01, phi/nu step 0.02; D1 <= D1_max) / OptMSP brute force (LSODA, 3000 h each): 1277.2 s for 43461 evaluations
+[runtime] PHB stage-1 stability diagnostics / port ODEs + finite-difference Jacobian: 877.8 s for 29379 evaluations
+       D  phi_optmsp  nu_optmsp  D1_optmsp  D2_optmsp  X2_optmsp  P2_optmsp  STY_cascade_optmsp  lambda1_optmsp  phi_optmsp_nofilter  nu_optmsp_nofilter  STY_cascade_optmsp_nofilter  phi_conti  nu_conti  P2_conti  STY_cascade_conti  STY_onestage_conti  X_onestage_optmsp  P_onestage_optmsp  STY_onestage_optmsp  STY_onestage_optmsp_robust  lambda1_onestage  same_design  rel_diff_STY_cascade  rel_diff_STY_onestage
+0   0.01        0.27       0.97     0.0900     0.0103     6.3263   141.9711              1.4197         -0.0900                 0.27                0.97                       1.4197       0.27      0.97  141.9711             1.4197              0.0103             7.8658             1.0328               0.0103                         NaN           -0.0100         True                  -0.0                    NaN
+1   0.02        0.41       0.95     0.1640     0.0211    10.6469   117.7086              2.3542         -0.1640                 0.41                0.95                       2.3542       0.41      0.95  117.7086             2.3542              0.0330            12.6194             1.6487               0.0330                      0.0330           -0.0200         True                   0.0                    0.0
+2   0.03        0.53       0.89     0.1445     0.0337    13.6320    94.7941              2.8438         -0.1445                 0.53                0.89                       2.8438       0.53      0.89   94.7941             2.8438              0.0618            15.7976             2.0605               0.0618                      0.0618           -0.0300         True                   0.0                    0.0
+3   0.04        0.61       0.85     0.1627     0.0471    15.8742    79.6545              3.1862         -0.1627                 0.61                0.85                       3.1862       0.61      0.85   79.6545             3.1862              0.0942            18.0675             2.3546               0.0942                      0.0942           -0.0400         True                  -0.0                    0.0
+4   0.05        0.67       0.83     0.1971     0.0602    17.3369    68.4510              3.4225         -0.1971                 0.67                0.83                       3.4225       0.67      0.83   68.4510             3.4225              0.1287            19.7656             2.5747               0.1287                      0.1287           -0.0500         True                  -0.0                   -0.0
+5   0.06        0.71       0.79     0.2029     0.0759    18.2484    57.6388              3.4583         -0.2029                 0.71                0.79                       3.4583       0.71      0.79   57.6388             3.4583              0.1647            21.0796             2.7449               0.1647                      0.1647           -0.0600         True                  -0.0                    0.0
+6   0.07        0.77       0.75     0.2156     0.0933    19.2065    49.8310              3.4882         -0.2128                 0.77                0.75                       3.4882       0.77      0.75   49.8310             3.4882              0.2016            22.1224             2.8800               0.2016                      0.2016           -0.0700         True                   0.0                   -0.0
+7   0.08        0.79       0.69     0.2039     0.1159    20.2821    42.8749              3.4300         -0.2039                 0.79                0.69                       3.4300       0.79      0.69   42.8749             3.4300              0.2391            22.9660             2.9893               0.2391                      0.2391           -0.0800         True                   0.0                    0.0
+8   0.09        0.83       0.65     0.2134     0.1385    20.8602    37.3662              3.3630         -0.2134                 0.83                0.65                       3.3630       0.83      0.65   37.3662             3.3630              0.2771            23.6580             3.0790               0.2771                      0.2771           -0.0900         True                   0.0                    0.0
+9   0.10        0.85       0.59     0.2073     0.1695    21.6941    32.2621              3.2262         -0.2073                 0.85                0.59                       3.2262       0.85      0.59   32.2621             3.2262              0.3153            24.2310             3.1532               0.3153                      0.3153           -0.1000         True                   0.0                   -0.0
+10  0.11        0.87       0.55     0.2127     0.2000    21.9202    28.0606              3.0867         -0.2127                 0.87                0.55                       3.0867       0.87      0.55   28.0606             3.0867              0.3536            24.7077             3.2149               0.3536                      0.3536           -0.1100         True                   0.0                    0.0
+11  0.12        0.89       0.51     0.2180     0.2353    22.0092    24.3777              2.9253         -0.1992                 0.89                0.51                       2.9253       0.89      0.51   24.3777             2.9253              0.3920            25.1041             3.2663               0.3920                      0.3920           -0.1200         True                  -0.0                    0.0
+12  0.13        0.89       0.47     0.2183     0.2766    21.9778    21.1348              2.7475         -0.1973                 0.89                0.47                       2.7475       0.89      0.47   21.1348             2.7475              0.4301            25.4312             3.3086               0.4301                      0.4301           -0.1300         True                   0.0                    0.0
+13  0.14        0.83       0.47     0.2192     0.2979    20.4084    18.4134              2.5779         -0.1922                 0.83                0.47                       2.5779       0.83      0.47   18.4134             2.5779              0.4680            25.6961             3.3429               0.4680                      0.4680           -0.1400         True                  -0.0                   -0.0
+14  0.15        0.77       0.47     0.2179     0.3191    19.0466    16.2042              2.4306         -0.1994                 0.77                0.47                       2.4306       0.77      0.47   16.2042             2.4306              0.5054            25.9023             3.3695               0.5054                      0.5054           -0.1500         True                  -0.0                    0.0
+15  0.16        0.75       0.45     0.2182     0.3556    18.5319    14.3987              2.3038         -0.1980                 0.75                0.45                       2.3038       0.75      0.45   14.3987             2.3038              0.5422            26.0497             3.3886               0.5422                      0.5422           -0.1600         True                  -0.0                    0.0
+16  0.17        0.71       0.45     0.2195     0.3778    17.4415    12.8879              2.1909         -0.1911                 0.71                0.45                       2.1909       0.71      0.45   12.8879             2.1909              0.5779            26.1338             3.3994               0.5779                      0.5779           -0.1700         True                   0.0                    0.0
+17  0.18        0.67       0.45     0.2193     0.4000    16.4735    11.6153              2.0908         -0.1921                 0.67                0.45                       2.0908       0.67      0.45   11.6153             2.0908              0.6121            26.1439             3.4006               0.6121                      0.6121           -0.1800         True                   0.0                   -0.0
+18  0.19        0.63       0.45     0.2176     0.4222    15.6038    10.5299              2.0007         -0.2010                 0.63                0.45                       2.0007       0.63      0.45   10.5299             2.0007              0.6440            26.0583             3.3894               0.6440                      0.6440           -0.1900         True                  -0.0                    0.0
+19  0.20        0.63       0.43     0.2211     0.4651    15.3500     9.5874              1.9175         -0.1830                 0.63                0.43                       1.9175       0.63      0.43    9.5874             1.9175              0.6720            25.8351             3.3602               0.6720                      0.6720           -0.2000         True                   0.0                   -0.0
+20  0.21        0.57       0.45     0.2176     0.4667    14.1180     8.7948              1.8469         -0.2010                 0.57                0.45                       1.8469       0.57      0.45    8.7948             1.8469              0.6934            25.3869             3.3019               0.6934                      0.6934           -0.2100         True                   0.0                    0.0
+21  0.22        0.57       0.43     0.2200     0.5116    13.9657     8.0949              1.7809         -0.1883                 0.57                0.43                       1.7809       0.57      0.43    8.0949             1.7809              0.7012            24.5060             3.1872               0.7012                      0.7012           -0.1883         True                   0.0                    0.0
+22  0.23        0.55       0.43     0.2219     0.5349    13.3342     7.4683              1.7177         -0.1788                 0.55                0.43                       1.7177       0.55      0.43    7.4683             1.7177              0.6749            22.5629             2.9344               0.6749                      0.6749           -0.0767         True                   0.0                   -0.0
+
+Same (phi, nu) at 23 of 23 D values; max |rel. diff STY_cascade| = 6.1e-10
+Feasible in OptMSP: 39349 points, of which 5351 fail ContiDesigner's stability filter (lambda1 < -0.01 and < -0.2 D1); 1112 points had not reached steady state after 3000 h (transient left > 0.1 %).
+Global OptMSP brute-force optimum: D=0.07, phi=0.77, nu=0.75, D1=0.216, D2=0.093, X2=19.21, P2=49.83, STY=3.4882, lambda1=-0.213 1/h

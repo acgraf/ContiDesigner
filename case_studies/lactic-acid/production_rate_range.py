@@ -1,6 +1,7 @@
 # %%
 from pathlib import Path
 import sys
+
 sys.path.append(str(Path(__file__).resolve().parents[3]))
 import numpy as np
 import pandas as pd
@@ -18,10 +19,11 @@ DEFAULT_PROCESSES = ContiDesigner.DEFAULT_PROCESSES
 # %%
 
 
-log_file = "run_log_20260806.txt"  # define a separate log file
+log_file = f"run_log_{time.strftime('%Y%m%d')}.txt"  # define a separate log file
 params_base = DEFAULT_PROCESSES["LA"]
 params_base
-pi0_s1_ref = params_base["pi0_s1"]#0.1
+pi0_s1_ref = params_base["pi0_s1"]  # 0.1
+
 
 # %%
 def run_single_case(args):
@@ -31,17 +33,19 @@ def run_single_case(args):
     params = copy.deepcopy(params_base)
 
     pi0_s1 = pi0_s1_ref
-    pi1_s1 = (r1 / (1 - r1)) * pi0_s1/params["mu_max"]
+    pi1_s1 = (r1 / (1 - r1)) * pi0_s1 / params["mu_max"]
     # pi0_s2 = (r0 / (1 - r0)) * pi0_s1
     # pi0_s2 = r0 * pi0_s1
-    pi0_s2 = pi0_s1/r0
-
+    pi0_s2 = pi0_s1 / r0
 
     params["pi0_s1"] = pi0_s1
     params["pi0_s2"] = pi0_s2
     params["pi1_s1"] = pi1_s1
 
     errors = []
+    # defaults, so a failed optimization gives a NaN row instead of a crash
+    D_ts = sty_ts = phi = ny = x1 = np.nan
+    D_os = sty_os = x_os = np.nan
 
     try:
         model = ContiModel(params)
@@ -49,7 +53,7 @@ def run_single_case(args):
 
         # two-stage
         df, D_ts, sty_ts = solver.optimize_phi_ny_across_D()
-        best_D_total = df["STY_cascade"].idxmax()
+        best_D_total = df["STY_twostage"].idxmax()
 
         phi = df.loc[best_D_total]["phi_opt"]
         ny = df.loc[best_D_total]["ny_opt"]
@@ -61,9 +65,9 @@ def run_single_case(args):
     try:
         # one-stage
         opt_os = solver.find_optimum_D_total(max_param="STY_onestage")
-        sty_os, D_os, steady_states= opt_os[0], opt_os[1], opt_os[2]
+        sty_os, D_os, steady_states = opt_os[0], opt_os[1], opt_os[2]
         max_row = steady_states["STY_onestage"].idxmax()
-        print(D_os==steady_states.loc[max_row]["D_total"])
+        print(D_os == steady_states.loc[max_row]["D_total"])
         x_os = steady_states.loc[max_row]["X_onestage"]
 
     except Exception as e:
@@ -101,7 +105,7 @@ if __name__ == "__main__":
 
     tasks = [(r0, r1) for r0 in pi0_ratio_range for r1 in pi1_ratio_range]
 
-    nproc = min(cpu_count(), 90)
+    nproc = min(cpu_count(), 70)
     output_file = "df_production_rate_range.csv"
     batch_size = 100
 
@@ -111,9 +115,9 @@ if __name__ == "__main__":
 
         results = df.to_dict("records")
         tasks = [(r0, r1) for (r0, r1) in tasks if (r0, r1) not in done]
-        #print(f"Resuming from {start_idx} / {len(tasks)}")
+        # print(f"Resuming from {start_idx} / {len(tasks)}")
         print(f"Resuming: {len(done)} done, {len(tasks)} remaining")
-        #tasks = tasks[start_idx:]
+        # tasks = tasks[start_idx:]
     else:
         results = []
     with Pool(processes=nproc) as pool:
@@ -129,20 +133,16 @@ if __name__ == "__main__":
                 batch_start = time.time()
                 completed = len(results)
                 msg = (
-                        f"{completed}/{total} results saved. "
-                        f"Last {batch_size} in {elapsed:.2f} seconds.\n"
-                    )
+                    f"{completed}/{total} results saved. "
+                    f"Last {batch_size} in {elapsed:.2f} seconds.\n"
+                )
                 with open(log_file, "a") as logf:
                     logf.write(msg)
 
                 print(msg.strip(), flush=True)
-                
-                
 
     expected = len(pi0_ratio_range) * len(pi1_ratio_range)
-    actual = len(
-        pd.DataFrame(results)[["pi0_ratio", "pi1_ratio"]].drop_duplicates()
-    )
+    actual = len(pd.DataFrame(results)[["pi0_ratio", "pi1_ratio"]].drop_duplicates())
 
     assert actual == expected, (actual, expected)
 

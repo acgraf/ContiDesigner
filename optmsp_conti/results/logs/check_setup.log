@@ -1,0 +1,5 @@
+OptMSP/MultiStagePackage/OptMSPfunctions.py:431: RuntimeWarning: divide by zero encountered in scalar divide
+  'Y_SubInput': [np.round((res[indexes[2]]/s[indexes[1]]), decimals=decimal)],
+OptMSP:        STY = 3.4882 at D = 0.07, phi = 0.77, nu = 0.75
+ContiDesigner: STY = 3.4882 at the same design point
+Setup OK

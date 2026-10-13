@@ -1,6 +1,6 @@
 """Run the whole sensitivity analysis, step by step. Run it from this folder:
 
-    python run_all.py                # all steps, ~1 h (with conti env)
+    python run_all.py                # all steps, ~25 min (conti env)
 
 The output of each step goes to results/logs/<step>.log
 """

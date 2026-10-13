@@ -1,0 +1,13 @@
+seed 1: STY=3.53102 at D=0.0657, phi=0.7527, nu=0.7585 (9812 evals, 266 s)
+seed 2: STY=3.53102 at D=0.0657, phi=0.7527, nu=0.7585 (9364 evals, 351 s)
+seed 3: STY=3.53102 at D=0.0657, phi=0.7527, nu=0.7585 (10068 evals, 412 s)
+seed 4: STY=3.53102 at D=0.0657, phi=0.7527, nu=0.7585 (10004 evals, 293 s)
+seed 5: STY=3.53102 at D=0.0657, phi=0.7527, nu=0.7585 (9044 evals, 329 s)
+[runtime] PHB two-stage, continuous (D, phi, nu) / differential evolution on OptMSP-port ODEs (LSODA to steady state): 1651.4 s for 48292 evaluations
+            objective  seed        D      phi       nu      STY  rel_gain_vs_grid  n_evaluations  lambda1
+0                 ode   1.0  0.06566  0.75271  0.75849  3.53102           0.01228         9812.0 -0.20464
+1                 ode   2.0  0.06566  0.75271  0.75849  3.53102           0.01228         9364.0 -0.20464
+2                 ode   3.0  0.06566  0.75271  0.75849  3.53102           0.01228        10068.0 -0.20464
+3                 ode   4.0  0.06566  0.75271  0.75849  3.53102           0.01228        10004.0 -0.20464
+4                 ode   5.0  0.06566  0.75271  0.75849  3.53102           0.01228         9044.0 -0.20464
+5  grid_ContiDesigner   NaN  0.07000  0.77000  0.75000  3.48817           0.00000            NaN      NaN

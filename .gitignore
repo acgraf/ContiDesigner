@@ -7,3 +7,6 @@ dash_cache/
 *.vscode/
 pi_tests/*
 test*
+.ipynb_checkpoints/
+*.egg-info/
+run_log_*.txt

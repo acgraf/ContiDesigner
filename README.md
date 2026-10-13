@@ -41,16 +41,17 @@ ContiDesigner can be used in three ways:
 
 ## Installation
 
-Clone the repository and install in editable mode:
-
+Clone the repository, create the conda environment from `env.yml` and install ContiDesigner into it in editable mode:
 
 ```bash
-git clone <repo-url!! insert here once done>
+git clone https://github.com/acgraf/ContiDesigner
 cd ContiDesigner
+conda env create -f env.yml
+conda activate ContiDesigner
 pip install -e .
 ```
 
-Install the conda env we provide in env.yml
+`env.lock.yml` pins the exact versions used for the paper.
 
 ## Usage
 
@@ -76,6 +77,7 @@ The interface consists of:
 - Input panel (parameters)
 - Results panel (plots, tables, downloads)
 - Information panel
+
 ### Web app (hosted)
 
 Access the hosted version: https://chemnettools.anc.univie.ac.at/ContiDesigner/
@@ -83,21 +85,28 @@ Access the hosted version: https://chemnettools.anc.univie.ac.at/ContiDesigner/
 This is the easiest way to explore the tool without setup.
 
 ## Project Structure
-app/ Dash application and UI logic
-dash_app.py Main app entry point
-conti_reactions.py Reaction definitions (for the sbml export)
-export_sbml.py SBML export
-layout/ UI components
-assets/ Static assets
 
-src/ContiDesigner/ Core package (installable)
-core/ Models and solvers
-plot/ Plotting utilities
-utils/ Helpers
+```
+app/                     Dash application and UI logic
+  dash_app.py            Main app entry point
+  conti_reactions.py     Reaction definitions (for the SBML export)
+  export_sbml.py         SBML export
+  layout/                UI components
+  assets/                Static assets
 
-case_studies/ Reproducible examples
-LA/ Lactic acid system
-PHB/ PHB system
+src/ContiDesigner/       Core package (installable)
+  core/                  Models and solvers
+  plot/                  Plotting utilities
+  utils/                 Helpers
+
+case_studies/            Reproducible examples
+  lactic-acid/           Lactic acid system
+  PHB/                   PHB system
+
+sensitivity_analysis/    Accuracy and uncertainty of the PHB optimum (see its README)
+optmsp_conti/            Independent check of the PHB optimum with OptMSP (see its README)
+paper/                   Script for the graphical abstract
+```
 
 ## Typical Workflow
 

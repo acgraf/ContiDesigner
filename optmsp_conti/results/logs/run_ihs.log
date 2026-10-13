@@ -1,0 +1,6 @@
+IHS seed 1: STY=3.3808 at D=0.08, phi=0.79, nu=0.67 (2030 evals = 4.7% of the grid, 72 s)
+IHS seed 2: STY=2.9060 at D=0.07, phi=0.63, nu=0.73 (2030 evals = 4.7% of the grid, 74 s)
+IHS seed 3: STY=3.0505 at D=0.07, phi=0.63, nu=0.77 (2030 evals = 4.7% of the grid, 75 s)
+IHS seed 4: STY=3.1967 at D=0.07, phi=0.71, nu=0.71 (2030 evals = 4.7% of the grid, 83 s)
+IHS seed 5: STY=3.1767 at D=0.1, phi=0.83, nu=0.59 (2030 evals = 4.7% of the grid, 73 s)
+[runtime] PHB two-stage grid via OptMSP Optimizer / OptMSP Optimizer + pygmo IHS (2000 generations, pop 30): 376.1 s for 10150 evaluations

@@ -12,8 +12,10 @@ import pandas as pd
 import copy
 
 # %%
-# %%
-params = copy.deepcopy(DEFAULT_PROCESSES["PHB"])
+# Fine grid (paper grid): D step 0.005, phi/ny step 0.01
+FINE_GRID = {"D_step": 0.005, "phi_ny_step": 0.01}
+
+params = {**copy.deepcopy(DEFAULT_PROCESSES["PHB"]), **FINE_GRID}
 
 def calc_D1_D2_df(df_base):
     df = copy.deepcopy(df_base)
@@ -30,7 +32,7 @@ solver = conti_solver.Solver(model)
 
 plotter = conti_plotter.Plotter(model, solver)
 
-df, _, _ = solver.optimize_phi_ny_across_D(max_param="STY_cascade")
+df, _, _ = solver.optimize_phi_ny_across_D(max_param="STY_twostage")
 df = calc_D1_D2_df(df)
 
 # %%
@@ -50,9 +52,9 @@ max_D1_D1X1 = df_D1X1["D1"].max()
 max_D1_P1 = df_P1["D1"].max()
 max_D1_STY1 = df_STY1["D1"].max()
 # %%
-
-params_5R = copy.deepcopy(DEFAULT_PROCESSES["PHB"])
-params_5R["sf2_max"] = 200
+sff2 = 240
+params_5R = {**copy.deepcopy(DEFAULT_PROCESSES["PHB"]), **FINE_GRID}
+params_5R["sf2_max"] = sff2
 model_5R = conti_model.ContiModel(params_5R)
 
 solver_5R = conti_solver.Solver(model_5R)
@@ -60,7 +62,7 @@ solver_5R = conti_solver.Solver(model_5R)
 plotter_5R = conti_plotter.Plotter(model_5R, solver_5R)
 
 df_5R, _, _ = solver_5R.optimize_phi_ny_across_D(
-    max_param="STY_cascade", secondary_param="STY_2"
+    max_param="STY_twostage", secondary_param="STY_2"
 )
 
 
@@ -68,7 +70,7 @@ df_5R, _, _ = solver_5R.optimize_phi_ny_across_D(
 fig_STY = plotter.plot_D_range(Data=df)
 wanted_names = {
     "STY (One-stage)",
-    "STY (Cascade)",
+    "STY (Two-stage)",
 }
 
 fig_STY.data = tuple(t for t in fig_STY.data if getattr(t, "name", "") in wanted_names)
@@ -78,7 +80,7 @@ for trace in fig_STY.data:
 
 name_map = {
     "STY (One-stage)": "STY<sub>one-stage</sub>",
-    "STY (Cascade)": "STY<sub>two-stage</sub> (s<sub>2</sub><sup>F max </sup> = 500 g/L)",
+    "STY (Two-stage)": "STY<sub>two-stage</sub> (s<sub>2</sub><sup>F max </sup> = 500 g/L)",
 }
 
 
@@ -93,8 +95,8 @@ for trace in fig_STY.data:
                 0,
                 max(
                     df["STY_onestage"].max(),
-                    df["STY_cascade"].max(),
-                    df_5R["STY_cascade"].max(),
+                    df["STY_twostage"].max(),
+                    df_5R["STY_twostage"].max(),
                 )
                 * 1.4,
             ],
@@ -112,18 +114,18 @@ for trace in fig_STY.data:
 fig_STY.add_trace(
     go.Scatter(
         x=df_5R["D_total"],
-        y=df_5R["STY_cascade"],
+        y=df_5R["STY_twostage"],
         mode="lines",
         line=dict(dash="dot", color="red"),
-        name="STY<sub>two-stage</sub> (s<sub>2</sub><sup>F max</sup> = 200 g/L)",
+        name="STY<sub>two-stage</sub> (s<sub>2</sub><sup>F max</sup> = 240 g/L)",
         yaxis="y",
     ),
 )
 
 fig_STY.add_trace(
     go.Scatter(
-        x=[0.03],
-        y=[1.72],
+        x=[0.034],
+        y=[2.14],
         mode="markers",
         marker=dict(symbol="x", size=10, color="black"),
         name="STY<sub>five-stage</sub> (Experimental)",
@@ -143,7 +145,7 @@ fig_STY.update_layout(
     ),
     yaxis=dict(
         title=dict(text="STY [g/L/h]", font=dict(size=16)),
-        range=[0, max(df["STY_onestage"].max(), df["STY_cascade"].max()) * 1.3],
+        range=[0, max(df["STY_onestage"].max(), df["STY_twostage"].max()) * 1.3],
     ),
     legend=dict(
         xanchor="left",

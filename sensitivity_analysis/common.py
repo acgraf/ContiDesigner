@@ -1,6 +1,6 @@
 """
 Shared code of the PHB sensitivity analysis: optimise a parameter set,
-evaluate a fixed design, draw uncertain parameters, save figures.
+draw uncertain parameters, save figures.
 
 All scripts are run from this folder; they write to results/data and
 results/figures.
@@ -29,12 +29,7 @@ BASE = copy.deepcopy(DEFAULT_PROCESSES["PHB"])
 PARAMETERS = ["mu_max", "Ks", "delta", "Yxs_1", "Yps_1", "pi1_s1", "pi0_s2", "rho_1"]
 RSD = 0.10             # relative standard deviation of the parameter uncertainty
 
-LABELS = {"mu_max": "μ<sub>max</sub>", "Ks": "K<sub>S</sub>", "delta": "δ",
-          "Yxs_1": "Y<sup>X/S</sup>", "Yps_1": "Y<sup>P/S</sup>",
-          "pi1_s1": "π<sub>1</sub><sup>μ</sup>", "pi0_s2": "π<sub>2</sub><sup>0</sup>",
-          "rho_1": "ρ", "STY_TS": "STY<sub>TS</sub>", "STY_OS": "STY<sub>OS</sub>",
-          "dSTY": "ΔSTY<sup>opt</sup>"}
-RED, BLUE, ORANGE, GREY = colors.red, colors.blue, "orange", "rgb(120,120,120)"
+RED, BLUE, GREY = colors.red, colors.blue, "rgb(120,120,120)"
 PENALTY = 1e6
 
 
@@ -106,43 +101,6 @@ def optimise(params, warm_start=None):
         fed = model.F1 * model.sf1 + model.F2 * model.sf2    # F2: fresh stage-2 feed
         out.update(titer=P2, Y_fed=P2 * model.F_total / fed)
     return out
-
-
-def evaluate_two_stage(params, D, phi, nu):
-    """A fixed two-stage design under the given ('true') parameters.
-
-    status: "ok", "stage-2 substrate shortage" (the stage-2 feed the design
-    needs, plus ContiDesigner's 5 % buffer, exceeds sf2_max: the same
-    feasibility rule as in optimise()), "stage-1 washout" (D1 > D1_max), or
-    "stage 1 near washout" (no steady state that passes ContiDesigner's
-    stability criterion). sf2_need: the stage-2 feed the design needs
-    (without the buffer).
-    """
-    out = dict(STY=np.nan, status="ok", sf2_need=np.nan)
-    m = ContiModel({**copy.deepcopy(params), "sf2_max": 1e9})   # no cap: get the demand
-    with m.temporary_params({"D_total": D, "phi": phi, "ny": nu}):
-        if phi / (1 - nu) * D >= m.D1_max:
-            out["status"] = "stage-1 washout"
-            return out
-        st = Solver(m).calculate_steady_states()
-        if not np.all(np.isfinite(st)):
-            out["status"] = "stage 1 near washout"
-            return out
-        out["sf2_need"] = m.sf2 / 1.05
-        if m.sf2 > params["sf2_max"]:          # m.sf2: buffered feed, as in the solver
-            out["status"] = "stage-2 substrate shortage"
-        out["STY"] = D * st[5]
-    return out
-
-
-def evaluate_one_stage(params, D):
-    """STY of a one-stage process at fixed D, or NaN if it has no steady state."""
-    m = ContiModel(copy.deepcopy(params))
-    if D >= m.D1_max:
-        return np.nan
-    with m.temporary_params({"D_total": D}):
-        P = Solver(m).calculate_steady_states(onestage=True)[2]
-    return D * P if np.isfinite(P) else np.nan
 
 
 def draw_parameters(n, seed=0):

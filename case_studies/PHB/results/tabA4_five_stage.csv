@@ -1,0 +1,16 @@
+,case,X,X_dev_%,PHB,PHB_dev_%,S
+R1,growth-arrested R2-R5,25.666,2.665,3.339,233.9,1.462
+R2,growth-arrested R2-R5,23.568,-12.709,18.292,21.949,0.0
+R3,growth-arrested R2-R5,21.563,-10.154,32.66,-9.278,0.0
+R4,growth-arrested R2-R5,19.899,-0.506,44.819,-12.119,0.0
+R5,growth-arrested R2-R5,18.553,-2.355,53.344,-15.327,0.0
+R1,growth in R2,25.666,2.665,3.339,233.9,1.462
+R2,growth in R2,25.694,-4.837,16.018,6.786,0.0
+R3,growth in R2,23.508,-2.051,30.195,-16.125,0.0
+R4,growth in R2,21.693,8.467,42.218,-17.22,0.0
+R5,growth in R2,20.226,6.451,50.516,-19.815,0.0
+R1,glucose-dependent rates,27.908,11.63,3.631,263.06,1.462
+R2,glucose-dependent rates,25.627,-5.087,21.47,43.135,0.525
+R3,glucose-dependent rates,23.446,-2.308,38.022,5.618,0.679
+R4,glucose-dependent rates,21.637,8.183,51.746,1.462,0.776
+R5,glucose-dependent rates,20.173,6.172,63.123,0.195,0.417
