@@ -1,0 +1,31 @@
+nominal: {'STY_TS': np.float64(3.531), 'STY_OS': np.float64(0.7014), 'dSTY': np.float64(4.0342), 'D_opt': 0.0658, 'phi_opt': 0.7532, 'nu_opt': 0.7578, 'titer': 53.6859, 'D_OS': 0.2188, 'titer_OS': np.float64(3.2063), 'Y_fed': 0.3087}
+200/2000 (99 s)
+400/2000 (202 s)
+600/2000 (296 s)
+800/2000 (406 s)
+1000/2000 (512 s)
+1200/2000 (614 s)
+1400/2000 (709 s)
+1600/2000 (802 s)
+1800/2000 (893 s)
+2000/2000 (1000 s)
+Optimal design    Dilution rate D  median -0.001  5-95 % [-0.143, +0.150]  within ±10%: 73.6%
+Optimal design    Feed split ϕ     median +0.001  5-95 % [-0.037, +0.038]  within ±10%: 100.0%
+Optimal design    Volume split ν   median +0.000  5-95 % [-0.022, +0.021]  within ±10%: 100.0%
+Space-time yield  One-stage        median -0.000  5-95 % [-0.253, +0.271]  within ±10%: 46.7%
+Space-time yield  Two-stage        median -0.006  5-95 % [-0.183, +0.184]  within ±10%: 62.9%
+Titer             One-stage        median +0.000  5-95 % [-0.193, +0.192]  within ±10%: 60.1%
+Titer             Two-stage        median -0.002  5-95 % [-0.153, +0.157]  within ±10%: 70.5%
+two-stage better in 100.0% of 2000 draws; dSTY median +4.02, 5-95 % [+3.02, +5.48] (nominal +4.03)
+
+Spearman correlation of each parameter with each output:
+           STY_TS  STY_OS  dSTY  titer
+parameter                             
+mu_max       0.30    0.64 -0.49  -0.35
+Ks          -0.06   -0.13  0.10   0.03
+delta        0.05    0.03  0.01   0.02
+Yxs_1        0.54    0.47 -0.10   0.31
+Yps_1        0.27    0.06  0.14   0.65
+pi1_s1      -0.03    0.49 -0.58  -0.06
+pi0_s2       0.69    0.03  0.52   0.52
+rho_1       -0.14   -0.09 -0.01  -0.14

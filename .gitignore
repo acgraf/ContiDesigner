@@ -10,3 +10,4 @@ test*
 .ipynb_checkpoints/
 *.egg-info/
 run_log_*.txt
+dash_jobs/

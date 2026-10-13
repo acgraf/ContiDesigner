@@ -1,0 +1,7 @@
+sf2_max=100: STY_TS=2.4911 (D=0.1300, phi=0.6217, nu=0.6266, S2=1.80e+00), STY_OS=0.7014, substrate in TS/OS = 10.33/14.66 g/L/h
+sf2_max=200: STY_TS=2.9238 (D=0.0975, phi=0.6763, nu=0.6873, S2=3.08e+00), STY_OS=0.7014, substrate in TS/OS = 10.73/14.66 g/L/h
+sf2_max=300: STY_TS=3.1910 (D=0.0820, phi=0.7105, nu=0.7200, S2=4.14e+00), STY_OS=0.7014, substrate in TS/OS = 11.02/14.66 g/L/h
+sf2_max=500: STY_TS=3.5310 (D=0.0657, phi=0.7527, nu=0.7585, S2=5.89e+00), STY_OS=0.7014, substrate in TS/OS = 11.43/14.66 g/L/h
+sf2_max=750: STY_TS=3.7963 (D=0.0549, phi=0.7843, nu=0.7869, S2=7.70e+00), STY_OS=0.7014, substrate in TS/OS = 11.77/14.66 g/L/h
+sf2_max=1000: STY_TS=3.9789 (D=0.0483, phi=0.8054, nu=0.8058, S2=9.27e+00), STY_OS=0.7014, substrate in TS/OS = 12.01/14.66 g/L/h
+[runtime] PHB continuous optimum vs sf2_max (6 values) / differential evolution on ContiDesigner closed form: 20.5 s for 56248 evaluations

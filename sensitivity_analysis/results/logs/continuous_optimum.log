@@ -1,0 +1,7 @@
+seed 1: STY=3.53102 at D=0.0657, phi=0.7527, nu=0.7585 (9812 evals, 4 s)
+seed 2: STY=3.53102 at D=0.0657, phi=0.7527, nu=0.7585 (9428 evals, 3 s)
+seed 3: STY=3.53102 at D=0.0657, phi=0.7527, nu=0.7585 (10068 evals, 4 s)
+seed 4: STY=3.53102 at D=0.0657, phi=0.7527, nu=0.7585 (9620 evals, 3 s)
+seed 5: STY=3.53102 at D=0.0657, phi=0.7527, nu=0.7585 (9044 evals, 3 s)
+[runtime] PHB two-stage, continuous (D, phi, nu) / differential evolution on ContiDesigner closed form: 17.2 s for 47972 evaluations
+spread over seeds: STY 2.1e-11 g/L/h, D 2.7e-07, phi 1.0e-06, nu 2.0e-06

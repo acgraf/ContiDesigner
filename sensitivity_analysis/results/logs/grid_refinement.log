@@ -1,0 +1,16 @@
+[runtime] grid refinement level 1 (hD=0.02, h=0.04, global) / ContiDesigner closed form: 1.8 s for 6875 evaluations
+level 1 (global, hD=0.02, h=0.04): 6875 points, STY=3.36636 at D=0.08000, phi=0.7700, nu=0.6900 (2 s)
+[runtime] grid refinement level 2 (hD=0.01, h=0.02, global) / ContiDesigner closed form: 14.6 s for 57500 evaluations
+level 2 (global, hD=0.01, h=0.02): 57500 points, STY=3.48817 at D=0.07000, phi=0.7700, nu=0.7500 (15 s)
+[runtime] grid refinement level 3 (hD=0.005, h=0.01, global) / ContiDesigner closed form: 114.9 s for 450846 evaluations
+level 3 (global, hD=0.005, h=0.01): 450846 points, STY=3.52235 at D=0.07000, phi=0.7700, nu=0.7400 (115 s)
+[runtime] grid refinement level 4 (hD=0.0025, h=0.005, local) / ContiDesigner closed form: 0.6 s for 2197 evaluations
+level 4 (local, hD=0.0025, h=0.005): 2197 points, STY=3.52860 at D=0.06750, phi=0.7600, nu=0.7500 (1 s)
+[runtime] grid refinement level 5 (hD=0.00125, h=0.0025, local) / ContiDesigner closed form: 0.6 s for 2197 evaluations
+level 5 (local, hD=0.00125, h=0.0025): 2197 points, STY=3.53056 at D=0.06625, phi=0.7550, nu=0.7550 (1 s)
+ level  scope  n_points   D_opt  phi_opt  nu_opt  STY_opt  rel_diff_STY_vs_continuous
+     1 global      6875 0.08000    0.770   0.690  3.36636                    -0.04663
+     2 global     57500 0.07000    0.770   0.750  3.48817                    -0.01213
+     3 global    450846 0.07000    0.770   0.740  3.52235                    -0.00245
+     4  local      2197 0.06750    0.760   0.750  3.52860                    -0.00068
+     5  local      2197 0.06625    0.755   0.755  3.53056                    -0.00013
