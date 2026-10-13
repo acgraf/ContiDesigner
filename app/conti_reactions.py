@@ -21,7 +21,7 @@ reaction_definitions_onestage = {
         },
         {
             "id":"s1_consumption",
-            "rate":"- (mu_max / Yxs_1 + (pi1_s1 * mu_max + pi0_s1)/Yps_1 + m_1 /Yas_1)* X_s1",
+            "rate":"- (mu_max / Yxs_1 + (pi1_s1 * mu_max + pi0_s1)/Yps_1 + rho_1 /Yas_1)* X_s1",
         },
         {
             "id":"s1_dilution",
@@ -41,7 +41,7 @@ reaction_definitions_onestage = {
         ],
 }
 
-reaction_definitions_cascade = {
+reaction_definitions_twostage = {
     "X_s1":[
         {
             "id":"x1_growth",
@@ -65,7 +65,7 @@ reaction_definitions_cascade = {
         {
             "id":"s1_consumption",
             "rate":"- (mu_max / Yxs_1 + "
-            "(pi1_s1 * mu_max + pi0_s1)/Yps_1 + m_1 /Yas_1)* X_s1",
+            "(pi1_s1 * mu_max + pi0_s1)/Yps_1 + rho_1 /Yas_1)* X_s1",
         },
         {
             "id":"s1_dilution",
@@ -114,7 +114,7 @@ reaction_definitions_cascade = {
         {
             "id":"s2_consumption",
             "rate":"- (mu_s2/Yxs_2 + "
-            "(pi1_s2 * mu_s2 + pi0_s2)/Yps_2 + m_2/Yas_2) * X_s2",  
+            "(pi1_s2 * mu_s2 + pi0_s2)/Yps_2 + rho_2/Yas_2) * X_s2",  
         },
         {
             "id":"s2_dilution",

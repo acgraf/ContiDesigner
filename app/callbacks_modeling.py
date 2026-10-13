@@ -88,7 +88,7 @@ def register_callbacks_modeling(app):
             Output("optimal_summary_card_store", "data"),
             Output("optimal_summary_data_store", "data"),
             Output("optimal_OS_model_sbml_store", "data"),
-            Output("optimal_cascade_model_sbml_store", "data"),
+            Output("optimal_twostage_model_sbml_store", "data"),
             Output("all4figures_run", "data"),
             Output("params_store", "data", allow_duplicate=True),
             Output("titer_alert", "children"),
@@ -98,6 +98,7 @@ def register_callbacks_modeling(app):
         [Input("checked_inputs_store", "data")],
         prevent_initial_call=True,
         allow_duplicate=True,
+        background=True,  # runs in a separate process (see dash_app.py)
     )
     def run_callback(checked):
         if not checked or not checked.get("ok"):
@@ -114,7 +115,7 @@ def register_callbacks_modeling(app):
             Output("selected_summary_card_store_D_range", "data"),
             Output("selected_summary_data_store_D_range", "data"),
             Output("selected_OS_model_sbml_store_D_range", "data"),
-            Output("selected_cascade_model_sbml_store_D_range", "data"),
+            Output("selected_twostage_model_sbml_store_D_range", "data"),
             Output("all4figures_D_range", "data"),
             Output("shared_state", "data", allow_duplicate=True),
             Output("titer_click_alert", "children"),
@@ -138,7 +139,7 @@ def register_callbacks_modeling(app):
             Output("selected_summary_card_store_contour", "data"),
             Output("selected_summary_data_store_contour", "data"),
             Output("selected_OS_model_sbml_store_contour", "data"),
-            Output("selected_cascade_model_sbml_store_contour", "data"),
+            Output("selected_twostage_model_sbml_store_contour", "data"),
             Output("all4figures_contour", "data"),
         ],
         [

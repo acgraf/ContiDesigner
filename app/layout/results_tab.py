@@ -83,9 +83,9 @@ time_evolution_card_onestage = plot_card(
     md=4,
 )
 
-time_evolution_card_cascade = plot_card(
-    {"id": "cascade_header"},
-    fill_graph("cascade_fig", "400px"),
+time_evolution_card_twostage = plot_card(
+    {"id": "twostage_header"},
+    fill_graph("twostage_fig", "400px"),
     md=8,
 )
 
@@ -128,7 +128,7 @@ results_layout = html.Div(
             [
                 dbc.Col(
                     dbc.Row(
-                        [time_evolution_card_onestage, time_evolution_card_cascade],
+                        [time_evolution_card_onestage, time_evolution_card_twostage],
                         className="h-100",
                     ),
                     md=8,

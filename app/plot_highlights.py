@@ -119,7 +119,7 @@ def add_highlight_marker(
 
     #  Contour plot
     if contour:
-        marker_name = "optimal_cascade" if is_optimal else "selected_cascade"
+        marker_name = "optimal_twostage" if is_optimal else "selected_twostage"
         line_name = "optimal_line" if is_optimal else "selected_line"
 
         # check overlap with optimal

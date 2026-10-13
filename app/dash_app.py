@@ -1,4 +1,5 @@
 import dash
+import diskcache
 import dash_bootstrap_components as dbc
 from flask_caching import Cache
 from app.layout import main_layout
@@ -15,8 +16,13 @@ Creates the Dash app, sets layout, initializes cache, and registers
 control‑flow, modeling, and results callbacks.
 """
 
+# long-running callbacks (the optimisation) run in a separate process and the
+# browser polls for the result, so no web-server request timeout applies
+background_callback_manager = dash.DiskcacheManager(diskcache.Cache("dash_jobs"))
+
 app = dash.Dash(
     __name__,
+    background_callback_manager=background_callback_manager,
     requests_pathname_prefix="/ContiDesigner/",
     routes_pathname_prefix="/ContiDesigner/",
     external_stylesheets=[
@@ -32,7 +38,7 @@ server = app.server
 modeling.cache = Cache(
     server,
     config={
-        "CACHE_TYPE": "filesystem",
+        "CACHE_TYPE": "FileSystemCache",
         "CACHE_DIR": "dash_cache",
     },
 )

@@ -149,7 +149,7 @@ overview_panel = make_equation_card(
             
             **Substrate consumption rate**
             $$
-            \sigma = \frac{\mu}{Y^\mathrm{{X/S}} + 
+            \sigma = \frac{\mu}{Y^\mathrm{X/S}} + 
             \frac{\mu \pi^\mu + \pi^0}{Y^\mathrm{P/S}} + 
             \frac{\rho}{Y^\mathrm{ATP/S}}
             $$
@@ -254,7 +254,7 @@ kinetics_panel = make_equation_card(
                         [
                             html.Strong("Combined: "),
                             dcc.Markdown(
-                                "$$\\mu = \\mu{max} \\times \\text{inhibition factors}$$",
+                                "$$\\mu = \\mu^{max} \\times \\text{inhibition factors}$$",
                                 mathjax=True,
                                 style=inhib_style,
                             ),
@@ -271,19 +271,19 @@ kinetics_panel = make_equation_card(
 )
 
 
-cascade_panel = make_equation_card(
-    "Cascade reactor scheme",
+twostage_panel = make_equation_card(
+    "Two-stage reactor scheme",
     [
-        html.Img(src="./assets/cascade_scheme.png", style={"width": "100%"}),
+        html.Img(src="./assets/twostage_scheme.png", style={"width": "100%"}),
         dcc.Markdown(
             r"""
-            The two stage reactor cascade setup is shown above.
+            The two-stage reactor setup is shown above.
             Stage&nbsp;1 focuses on biomass growth,
             while Stage&nbsp;2 focuses on product formation. The outlet of the first reactor feeds directly
             into the second reactor, and fresh substrate can be added to both reactors via separate
             feed streams.
 
-            The corresponding one-stage setup has the same total volume as the cascade, and its feed
+            The corresponding one-stage setup has the same total volume as the two-stage process, and its feed
             stream matches the combined feed entering the second reactor. The two-stage configuration
             is parameterized by $\phi$ (volume split) and $\nu$ (feed split).
             """,
@@ -300,7 +300,7 @@ info_layout = dbc.Container(
             [
                 dbc.Col([overview_panel], md=4),
                 dbc.Col([kinetics_panel, steady_state_panel], md=5),
-                dbc.Col(cascade_panel, md=3),
+                dbc.Col(twostage_panel, md=3),
             ],
             className="g-3",
         ),

@@ -68,7 +68,7 @@ About_tab = [
         "This tool simulates one- and two-stage continuous bioprocesses using "
         "steady-state models. Adjust kinetic, yield, and process parameters  "
         "to explore their impact on biomass growth and product formation.  "
-        "Compare single-stage vs. cascaded setups to identify optimal configurations.",
+        "Compare single-stage vs. two-stage setups to identify optimal configurations.",
         className="text-muted small",
     ),
 ]
@@ -184,7 +184,7 @@ stage_1_tab = (
                     ),
                     input_col(
                         labels["rho_1"],
-                        "m_1",
+                        "rho_1",
                         md=md_tab,
                     ),
                 ],
@@ -232,7 +232,7 @@ stage_2_tab = (
                     ),
                     input_col(
                         labels["rho_2"],
-                        "m_2",
+                        "rho_2",
                         md=md_tab,
                     ),
                 ],
@@ -271,6 +271,7 @@ stage_tabs = dbc.Col(
                     dbc.Tab(
                         stage_1_tab,
                         label="Stage 1: Growth",
+                        tab_id="stage1",
                         label_style={"color": "#6c757d"},
                         active_label_style={
                             "color": "#212529",
@@ -280,6 +281,7 @@ stage_tabs = dbc.Col(
                     dbc.Tab(
                         stage_2_tab,
                         label="Stage 2: Production",
+                        tab_id="stage2",
                         label_style={"color": "#6c757d"},
                         active_label_style={
                             "color": "#212529",
@@ -287,6 +289,8 @@ stage_tabs = dbc.Col(
                         },
                     ),
                 ],
+                # set explicitly: with Dash 4, dbc no longer selects the first tab itself
+                active_tab="stage1",
                 className="mb-0 w-100",
                 style={
                     "backgroundColor": "#fafafa",  # card background

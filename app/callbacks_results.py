@@ -122,38 +122,38 @@ def register_callbacks_results(app):
 
 
     @app.callback(
-        Output("download_sbml_file_optimal_cascade", "data"),
-        Input("download_sbml_cascade_btn_optimal", "n_clicks"),
-        State("optimal_cascade_model_sbml_store", "data"),
+        Output("download_sbml_file_optimal_twostage", "data"),
+        Input("download_sbml_twostage_btn_optimal", "n_clicks"),
+        State("optimal_twostage_model_sbml_store", "data"),
         prevent_initial_call=True,
     )
-    def download_sbml_optimal_cascade(n_clicks, optimodel_cascade_sbml):
+    def download_sbml_optimal_twostage(n_clicks, optimodel_twostage_sbml):
         if not n_clicks:
             raise PreventUpdate
-        if not optimodel_cascade_sbml:
+        if not optimodel_twostage_sbml:
             raise PreventUpdate
 
         return dict(
-            content=optimodel_cascade_sbml,
-            filename="optimal_model_cascade.sbml",
+            content=optimodel_twostage_sbml,
+            filename="optimal_model_twostage.sbml",
             type="text/xml",
         )
 
 
     @app.callback(
-        Output("download_sbml_file_selected_cascade", "data"),
-        Input("download_sbml_cascade_btn_selected", "n_clicks"),
-        State("selected_cascade_model_sbml_store", "data"),
+        Output("download_sbml_file_selected_twostage", "data"),
+        Input("download_sbml_twostage_btn_selected", "n_clicks"),
+        State("selected_twostage_model_sbml_store", "data"),
         prevent_initial_call=True,
     )
-    def download_sbml_selected_cascade(n_clicks, selected_model_cascade_sbml):
+    def download_sbml_selected_twostage(n_clicks, selected_model_twostage_sbml):
         if not n_clicks:
             raise PreventUpdate
-        if not selected_model_cascade_sbml:
+        if not selected_model_twostage_sbml:
             raise PreventUpdate
         return dict(
-            content=selected_model_cascade_sbml,
-            filename="selected_model_cascade.sbml",
+            content=selected_model_twostage_sbml,
+            filename="selected_model_twostage.sbml",
             type="text/xml",
         )
 
@@ -179,13 +179,13 @@ def register_callbacks_results(app):
     @app.callback(
         [
             Output("selected_OS_model_sbml_store", "data"),
-            Output("selected_cascade_model_sbml_store", "data"),
+            Output("selected_twostage_model_sbml_store", "data"),
         ],
         [
             Input("selected_OS_model_sbml_store_D_range", "data"),
-            Input("selected_cascade_model_sbml_store_D_range", "data"),
+            Input("selected_twostage_model_sbml_store_D_range", "data"),
             Input("selected_OS_model_sbml_store_contour", "data"),
-            Input("selected_cascade_model_sbml_store_contour", "data"),
+            Input("selected_twostage_model_sbml_store_contour", "data"),
         ],
         prevent_initial_call=True,
     )
@@ -195,13 +195,13 @@ def register_callbacks_results(app):
         triggered = callback_context.triggered[0]["prop_id"].split(".")[0]
         if triggered in [
             "selected_OS_model_sbml_store_D_range",
-            "selected_cascade_model_sbml_store_D_range",
+            "selected_twostage_model_sbml_store_D_range",
         ]:
             return os_drange, cas_drange
 
         if triggered in [
             "selected_OS_model_sbml_store_contour",
-            "selected_cascade_model_sbml_store_contour",
+            "selected_twostage_model_sbml_store_contour",
         ]:
             return os_contour, cas_contour
 
@@ -212,7 +212,7 @@ def register_callbacks_results(app):
     @app.callback(
         [
             Output("onestage_fig_store", "data"),
-            Output("cascade_fig_store", "data"),
+            Output("twostage_fig_store", "data"),
             Output("D_range_plot", "figure"),
             Output("contour_plot", "figure"),
         ],
@@ -233,24 +233,24 @@ def register_callbacks_results(app):
         if "contour" in trigger:
             # contour click
             onestage_fig = safe_load_or_no_update(contour_data.get("onestage"))
-            cascade_fig = safe_load_or_no_update(contour_data.get("cascade"))
+            twostage_fig = safe_load_or_no_update(contour_data.get("twostage"))
             D_range_fig = safe_load_or_no_update(contour_data.get("D_range"))
             contour_fig = safe_load_or_no_update(contour_data.get("contour"))
-            return onestage_fig, cascade_fig, D_range_fig, contour_fig
+            return onestage_fig, twostage_fig, D_range_fig, contour_fig
         elif "D_range" in trigger:
             # D range click
             onestage_fig = safe_load_or_no_update(drange_data.get("onestage"))
-            cascade_fig = safe_load_or_no_update(drange_data.get("cascade"))
+            twostage_fig = safe_load_or_no_update(drange_data.get("twostage"))
             D_range_fig = safe_load_or_no_update(drange_data.get("D_range"))
             contour_fig = safe_load_or_no_update(drange_data.get("contour"))
-            return onestage_fig, cascade_fig, D_range_fig, contour_fig
+            return onestage_fig, twostage_fig, D_range_fig, contour_fig
         else:
             onestage_fig = safe_load_or_no_update(run_data.get("onestage"))
-            cascade_fig = safe_load_or_no_update(run_data.get("cascade"))
+            twostage_fig = safe_load_or_no_update(run_data.get("twostage"))
             D_range_fig = safe_load_or_no_update(run_data.get("D_range"))
             contour_fig = safe_load_or_no_update(run_data.get("contour"))
 
-            return onestage_fig, cascade_fig, D_range_fig, contour_fig
+            return onestage_fig, twostage_fig, D_range_fig, contour_fig
 
 
     @app.callback(
@@ -274,19 +274,18 @@ def register_callbacks_results(app):
 
     @app.callback(
         Output("onestage_fig", "figure"),
-        Output("cascade_fig", "figure"),
-        # Input("time_evolution_selector", "value"),
+        Output("twostage_fig", "figure"),
         Input("onestage_fig_store", "data"),
-        Input("cascade_fig_store", "data"),
+        Input("twostage_fig_store", "data"),
         Input("onestage_fig_selected_store", "data"),
-        Input("cascade_fig_selected_store", "data"),
+        Input("twostage_fig_selected_store", "data"),
     )
     def update_time_evolution(
-        onestage_fig, cascade_fig, onestage_selected_fig, cascade_selected_fig
+        onestage_fig, twostage_fig, onestage_selected_fig, twostage_selected_fig
     ):
         fig_onestage = onestage_selected_fig or onestage_fig
-        fig_cascade = cascade_selected_fig or cascade_fig
-        return fig_onestage, fig_cascade
+        fig_twostage = twostage_selected_fig or twostage_fig
+        return fig_onestage, fig_twostage
 
 
 

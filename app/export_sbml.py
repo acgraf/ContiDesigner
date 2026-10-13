@@ -1,12 +1,13 @@
 import libsbml
+from ContiDesigner.core.solver import Solver
 from .conti_reactions import reaction_definitions_onestage
-from .conti_reactions import reaction_definitions_cascade
+from .conti_reactions import reaction_definitions_twostage
 
 
 # %%
 def create_sbml_basics(model, n_stages=2):
     # Create SBML document and model
-    label = "onestage" if n_stages == 1 else "cascade"
+    label = "onestage" if n_stages == 1 else "twostage"
     doc = libsbml.SBMLDocument(3, 2)  # SBML Level 3 Version 2
     sbml_model = doc.createModel()
     sbml_model.setId(f"{label}_conti_model")
@@ -40,8 +41,15 @@ def create_sbml_basics(model, n_stages=2):
             s.setSubstanceUnits("g_per_L")
             s.setConstant(False)  # is not constant
 
-    # add parameters
-    for k, v in model.numeric_input_params.items():
+    # add parameters. sf2 in the inputs is the default (sf2_max); the two-stage process runs
+    # on the stage-2 feed the solver derives for this design, so export that one.
+    # It is recomputed here because model.sf2 holds the last point evaluated
+    # (e.g. by a sweep), not necessarily this design.
+    params = dict(model.numeric_input_params)
+    if n_stages > 1:
+        Solver(model)  # computes the steady state of this design and sets model.sf2
+        params["sf2"] = model.sf2
+    for k, v in params.items():
         p = sbml_model.createParameter()
         p.setId(str(k))  # parameter name is ID
         # print(v)
@@ -128,7 +136,7 @@ def add_reactions_to_model(model, sbml_model, reaction_definitions):
 def export_contimodel_to_sbml(model, n_stages=2):
     """Return SBML as string instead of writing to file."""
     reaction_definitions = (
-        reaction_definitions_onestage if n_stages == 1 else reaction_definitions_cascade
+        reaction_definitions_onestage if n_stages == 1 else reaction_definitions_twostage
     )
     doc, sbml_model = create_sbml_basics(model, n_stages)
     sbml_model = add_reactions_to_model(model, sbml_model, reaction_definitions)

@@ -86,7 +86,7 @@ layout = html.Div(
         ),  # dcc keeps hidden states across callbacks
         dcc.Store(id="selected_D_state", data={}),  # selected D value state
         dcc.Store(id="onestage_fig_store"),  # optimal one-stage figure
-        dcc.Store(id="cascade_fig_store"),  # optimal cascade figure
+        dcc.Store(id="twostage_fig_store"),  # optimal two-stage process figure
         dcc.Store(id="D_range_fig_store"),  # optimal D range figure
         dcc.Store(id="contour_fig_store"),  # optimal contour figure
         dcc.Store(id="all4figures_run", data={}),  # all figures store
@@ -100,8 +100,8 @@ layout = html.Div(
             id="onestage_fig_selected_store"
         ),  # one-stage figure with selected point
         dcc.Store(
-            id="cascade_fig_selected_store"
-        ),  # cascade figure with selected point
+            id="twostage_fig_selected_store"
+        ),  # two-stage process figure with selected point
         dcc.Store(id="optimal_summary_card_store"),  # holds the visual card (dbc.Card)
         dcc.Store(id="selected_summary_card_store"),
         dcc.Store(
@@ -120,17 +120,17 @@ layout = html.Div(
         dcc.Store(id="selected_OS_model_sbml_store"),
         dcc.Store(id="selected_OS_model_sbml_store_D_range"),
         dcc.Store(id="selected_OS_model_sbml_store_contour"),
-        dcc.Store(id="optimal_cascade_model_sbml_store"),
-        dcc.Store(id="selected_cascade_model_sbml_store"),
-        dcc.Store(id="selected_cascade_model_sbml_store_D_range"),
-        dcc.Store(id="selected_cascade_model_sbml_store_contour"),
+        dcc.Store(id="optimal_twostage_model_sbml_store"),
+        dcc.Store(id="selected_twostage_model_sbml_store"),
+        dcc.Store(id="selected_twostage_model_sbml_store_D_range"),
+        dcc.Store(id="selected_twostage_model_sbml_store_contour"),
         dcc.Store(id="checked_inputs_store", data=[]),
         dcc.Download(id="download_summary_file_optimal"),
         dcc.Download(id="download_summary_file_selected"),
         dcc.Download(id="download_sbml_file_optimal_OS"),
         dcc.Download(id="download_sbml_file_selected_OS"),
-        dcc.Download(id="download_sbml_file_optimal_cascade"),
-        dcc.Download(id="download_sbml_file_selected_cascade"),
+        dcc.Download(id="download_sbml_file_optimal_twostage"),
+        dcc.Download(id="download_sbml_file_selected_twostage"),
         dcc.Download(id="download_D_range_grid_file"),
         dcc.Download(id="download_contour_grid_file"),
     ],

@@ -26,7 +26,7 @@ def cached_run_simulation(params):
 
 
 def get_optimum(params, solver, D_given=None):
-    max_param = "STY_cascade"
+    max_param = "STY_twostage"
     secondary_param = "X1"
     # optional minimum product titer (g/L), None = no constraint
     p_min = params.get("titer_min")
@@ -109,7 +109,7 @@ def run_infeasible(params, base_model, base_solver, D_grid):
     message = "No operating point reaches the minimum titer"
     figures_dicts = {
         "onestage": app_helpers.fig_to_dict(app_helpers.placeholder_fig(message)),
-        "cascade": app_helpers.fig_to_dict(app_helpers.placeholder_fig(message)),
+        "twostage": app_helpers.fig_to_dict(app_helpers.placeholder_fig(message)),
         "D_range": app_helpers.fig_to_dict(D_range_fig),
         "contour": app_helpers.fig_to_dict(app_helpers.placeholder_fig(message)),
     }
@@ -164,13 +164,13 @@ def run_simulation(params):
     opt_model = ContiModel(params)
     opt_solver = Solver(opt_model)
     opt_plotter = Plotter(opt_model, opt_solver)
-    steady_states_cascade = opt_solver.calculate_steady_states()
-    steady_states_cascade = opt_solver.calculate_steady_states()
-    steady_states_OS = opt_solver.calculate_steady_states(cascade=False)
+    steady_states_twostage = opt_solver.calculate_steady_states()
+    steady_states_twostage = opt_solver.calculate_steady_states()
+    steady_states_OS = opt_solver.calculate_steady_states(onestage=True)
 
-    STY_cascade_opt = opt_solver.calculate_STY(steady_states_cascade[-1], opt_values["D_opt"])
+    STY_twostage_opt = opt_solver.calculate_STY(steady_states_twostage[-1], opt_values["D_opt"])
     # create the 4 figures
-    onestage_fig_opt, cascade_fig_opt, D_range_fig, contour_fig = app_helpers.build_figures(
+    onestage_fig_opt, twostage_fig_opt, D_range_fig, contour_fig = app_helpers.build_figures(
         opt_plotter, D_range=D_grid, contour=phi_ny_grid,
         titer_min=params.get("titer_min"),
     )
@@ -178,7 +178,7 @@ def run_simulation(params):
     D_range_fig = add_highlight_marker(
         D_range_fig,
         opt_values["D_opt"],
-        STY_cascade_opt,
+        STY_twostage_opt,
         opt_values["D_opt"],
         is_optimal=True,
         secondary_y=True,
@@ -195,13 +195,13 @@ def run_simulation(params):
     )
     opt_figures_dicts = {
         "onestage": app_helpers.fig_to_dict(onestage_fig_opt),
-        "cascade": app_helpers.fig_to_dict(cascade_fig_opt),
+        "twostage": app_helpers.fig_to_dict(twostage_fig_opt),
         "D_range": app_helpers.fig_to_dict(D_range_fig),
         "contour": app_helpers.fig_to_dict(contour_fig),
     }
 
     sbml_model_opt_OS = export_contimodel_to_sbml(opt_model, n_stages=1)
-    sbml_model_opt_cascade = export_contimodel_to_sbml(opt_model, n_stages=2)
+    sbml_model_opt_twostage = export_contimodel_to_sbml(opt_model, n_stages=2)
 
     # the very first time we run the simulation, there is no selected figure
     # so the currently selected process is the optimal one
@@ -213,7 +213,7 @@ def run_simulation(params):
     shared_state.update({"trigger_source": "initial_optimal"})
 
     opt_summary_card, opt_summary_data = summarize_process(
-        steady_states_cascade,
+        steady_states_twostage,
         steady_states_OS,
         params,
         opt_model,
@@ -236,7 +236,7 @@ def run_simulation(params):
         opt_summary_card,
         opt_summary_data,
         sbml_model_opt_OS,
-        sbml_model_opt_cascade,
+        sbml_model_opt_twostage,
         opt_figures_dicts,
         params,
         *titer_alert(params.get("titer_min"), D_grid),
@@ -308,18 +308,18 @@ def handle_drange_click(
     )
     model_sel = ContiModel(params)
     solver_sel = Solver(model_sel)
-    steady_states_cascade = solver_sel.calculate_steady_states()
-    steady_states_OS = solver_sel.calculate_steady_states(cascade=False)
+    steady_states_twostage = solver_sel.calculate_steady_states()
+    steady_states_OS = solver_sel.calculate_steady_states(onestage=True)
     notice = ""
     if titer_missed:
         notice = (
             f"At D = {D_sel:.3f} /h no two-stage process reaches "
             f"P₂,min = {params['titer_min']:g} g/L (greyed-out region). "
             "Showing the STY-optimal two-stage process at this D without the "
-            f"constraint (P₂ = {steady_states_cascade[-1]:.2f} g/L)."
+            f"constraint (P₂ = {steady_states_twostage[-1]:.2f} g/L)."
         )
     sel_summary_card, sel_summary_data = summarize_process(
-        steady_states_cascade,
+        steady_states_twostage,
         steady_states_OS,
         params,
         model_sel,
@@ -328,7 +328,7 @@ def handle_drange_click(
         optimal_for_D=True,
     )
     plotter_sel = Plotter(model_sel, solver_sel)
-    onestage_selected, cascade_selected, _, contour_fig = app_helpers.build_figures(
+    onestage_selected, twostage_selected, _, contour_fig = app_helpers.build_figures(
         plotter_sel, contour=phi_ny_grid, titer_min=params.get("titer_min")
     )
     contour_selected = add_highlight_marker(
@@ -342,11 +342,11 @@ def handle_drange_click(
         D_value=selected_values["D_opt"],
     )
     sbml_model_OS_sel = export_contimodel_to_sbml(model_sel, n_stages=1)
-    sbml_model_cascade_sel = export_contimodel_to_sbml(model_sel, n_stages=2)
+    sbml_model_twostage_sel = export_contimodel_to_sbml(model_sel, n_stages=2)
 
     figures_dicts = {
         "onestage": app_helpers.fig_to_dict(onestage_selected),
-        "cascade": app_helpers.fig_to_dict(cascade_selected),
+        "twostage": app_helpers.fig_to_dict(twostage_selected),
         "D_range": app_helpers.fig_to_dict(D_range_selected),
         "contour": app_helpers.fig_to_dict(contour_selected),
     }
@@ -367,7 +367,7 @@ def handle_drange_click(
         sel_summary_card,
         sel_summary_data,
         sbml_model_OS_sel,
-        sbml_model_cascade_sel,
+        sbml_model_twostage_sel,
         figures_dicts,
         updated_shared_state,
         notice,
@@ -416,21 +416,21 @@ def handle_contour_click(
 
     solver_sel = Solver(model_sel)
 
-    steady_states_cascade = solver_sel.calculate_steady_states()
-    steady_states_cascade = solver_sel.calculate_steady_states()
+    steady_states_twostage = solver_sel.calculate_steady_states()
+    steady_states_twostage = solver_sel.calculate_steady_states()
     plotter = Plotter(model_sel, solver_sel)
-    (onestage_selected, cascade_selected, _, _) = app_helpers.build_figures(plotter)
+    (onestage_selected, twostage_selected, _, _) = app_helpers.build_figures(plotter)
     figures_dicts = {
         "onestage": app_helpers.fig_to_dict(onestage_selected),
-        "cascade": app_helpers.fig_to_dict(cascade_selected),
+        "twostage": app_helpers.fig_to_dict(twostage_selected),
         "D_range": app_helpers.fig_to_dict(D_range_fig),
         "contour": app_helpers.fig_to_dict(contour_selected),
     }
 
-    steady_states_OS = solver_sel.calculate_steady_states(cascade=False)
+    steady_states_OS = solver_sel.calculate_steady_states(onestage=True)
 
     sel_summary_card, sel_summary_data = summarize_process(
-        steady_states_cascade,
+        steady_states_twostage,
         steady_states_OS,
         params,
         model_sel,
@@ -439,11 +439,11 @@ def handle_contour_click(
         optimal_for_D=selected_is_opt,
     )
     sbml_model_OS_sel = export_contimodel_to_sbml(model_sel, n_stages=1)
-    sbml_model_cascade_sel = export_contimodel_to_sbml(model_sel, n_stages=2)
+    sbml_model_twostage_sel = export_contimodel_to_sbml(model_sel, n_stages=2)
     return (
         sel_summary_card,
         sel_summary_data,
         sbml_model_OS_sel,
-        sbml_model_cascade_sel,
+        sbml_model_twostage_sel,
         figures_dicts,
     )

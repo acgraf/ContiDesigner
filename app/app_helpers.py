@@ -39,7 +39,7 @@ def make_cache_key(params):
 
 def check_input_params(params_store):
     checked_inputs = {"missing": [], "present": []}
-    optional = ["Yxs_2", "Yps_2", "Yas_2", "m_2", "pi0_s2", "pi1_s2", "titer_min"]
+    optional = ["Yxs_2", "Yps_2", "Yas_2", "rho_2", "pi0_s2", "pi1_s2", "titer_min"]
     optional.append("Ki") if not params_store["is_substrate_inhibited"] else None
     optional.append("x_max") if not params_store["is_biomass_inhibited"] else None
     optional.append("p_max") if not params_store["is_product_inhibited"] else None
@@ -56,8 +56,8 @@ def check_input_params(params_store):
 def build_figures(plotter, D_range=False, contour=None, titer_min=None):
     # this just builds the 4 figures
     # and is called by run_simulation and by clicks in the D range or contour plot
-    cascade_fig = plotter.plot_time_evolution(cascade=True)
-    onestage_fig = plotter.plot_time_evolution(cascade=False)
+    twostage_fig = plotter.plot_time_evolution(onestage=False)
+    onestage_fig = plotter.plot_time_evolution(onestage=True)
     if contour:
         contour_fig = plotter.plot_contour(
             "phi_ny", "delta_STY_D", Data=contour, titer_min=titer_min
@@ -68,7 +68,7 @@ def build_figures(plotter, D_range=False, contour=None, titer_min=None):
         D_range_fig = plotter.plot_D_range(Data=D_range, titer_min=titer_min)
     else:
         D_range_fig = None
-    return onestage_fig, cascade_fig, D_range_fig, contour_fig
+    return onestage_fig, twostage_fig, D_range_fig, contour_fig
 
 def placeholder_fig(text):
     # empty figure with a centred message, used when there is nothing to plot
@@ -115,8 +115,8 @@ INPUT_MAP = {
     "Yxs_2": "Yxs_2",
     "Yps_2": "Yps_2",
     "Yas_2": "Yas_2",
-    "m_1": "m_1",
-    "m_2": "m_2",
+    "rho_1": "rho_1",
+    "rho_2": "rho_2",
     "V_total": "V_total",
     "sf1": "sf1",
     "sf2_max": "sf2_max",

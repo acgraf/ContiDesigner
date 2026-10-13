@@ -8,9 +8,9 @@ tooltips = information.tooltips
 
 
 def metric_row(
-    label, one_stage_val, cascade_val, unit=None, tooltip=None, row_id=None, decimals=2
+    label, one_stage_val, twostage_val, unit=None, tooltip=None, row_id=None, decimals=2
 ):
-    """Create a formatted metric row comparing one-stage and cascade values."""
+    """Create a formatted metric row comparing one-stage and two-stage values."""
     row_id = row_id or label.replace(" ", "_")
 
     def fmt(val):
@@ -30,7 +30,7 @@ def metric_row(
                 className="text-end",
             ),
             dbc.Col(
-                html.Span(fmt(cascade_val), className="text-dark"),
+                html.Span(fmt(twostage_val), className="text-dark"),
                 xs=3,
                 md=4,
                 className="text-end",
@@ -54,7 +54,7 @@ def download_button(item, prefix):
     map = {
         "summary": "Process Summary",
         "sbml_OS": "SBML (One-stage)",
-        "sbml_cascade": "SBML (Two-stage)",
+        "sbml_twostage": "SBML (Two-stage)",
     }
     button = dbc.Col(
         dbc.Button(
@@ -74,7 +74,7 @@ def download_button(item, prefix):
 
 
 def summarize_process(
-    steady_states_cascade,
+    steady_states_twostage,
     steady_states_OS,
     params,
     model,
@@ -113,17 +113,17 @@ def summarize_process(
         # but also needs to be done in the summary card, so the header reflects that
 
     prefix = "optimal" if is_optimal else "selected"
-    ss = steady_states_cascade
+    ss = steady_states_twostage
     xx2, ss2, pp2 = ss[3:6]
     ss1 = ss[1]
     sf2_min = model.sf2
 
     xx, ss, pp = steady_states_OS[0:3]
     prod1 = solver.calculate_STY(pp, model.D_total)
-    prod_cascade = solver.calculate_STY(pp2, model.D_total)
+    prod_twostage = solver.calculate_STY(pp2, model.D_total)
 
-    Yield_OS = solver.calculate_yield(pp, ss, cascade=False)
-    Yield_TS = solver.calculate_yield(pp2, ss2, cascade=True)
+    Yield_OS = solver.calculate_yield(pp, ss, onestage=True)
+    Yield_TS = solver.calculate_yield(pp2, ss2, onestage=False)
 
     card_header = dbc.CardHeader(
         [
@@ -217,7 +217,7 @@ def summarize_process(
                             metric_row(
                                 "Productivity",
                                 prod1,
-                                prod_cascade,
+                                prod_twostage,
                                 unit="[g/L/h]",
                                 tooltip=tooltips["productivity"],
                                 row_id=f"{prefix}_productivity",
@@ -289,7 +289,7 @@ def summarize_process(
                                 [
                                     download_button("summary", prefix),
                                     download_button("sbml_OS", prefix),
-                                    download_button("sbml_cascade", prefix),
+                                    download_button("sbml_twostage", prefix),
                                 ],
                                 className="g-4 mb-0 justify-content-center",
                             ),
@@ -307,15 +307,15 @@ def summarize_process(
     summary_data = {
         "prefix": prefix,
         "biomass_onestage": xx,
-        "biomass_cascade": xx2,
+        "biomass_twostage": xx2,
         "substrate_onestage": ss,
-        "substrate_cascade": ss2,
+        "substrate_twostage": ss2,
         "product_onestage": pp,
-        "product_cascade": pp2,
+        "product_twostage": pp2,
         "productivity_onestage": prod1,
-        "productivity_cascade": prod_cascade,
+        "productivity_twostage": prod_twostage,
         "yield_onestage": Yield_OS,
-        "yield_cascade": Yield_TS,
+        "yield_twostage": Yield_TS,
         "feed_rate": model.F_total,
         "feed_rate_stages": [model.F1, model.F1 + model.F2],
         "volume": model.V_total,
@@ -325,7 +325,7 @@ def summarize_process(
         "stage2_substrate": sf2_min,
     }
     if not is_optimal and optimal_for_D:
-        # if the selected D is not optimal, but the cascade is optimal
+        # if the selected D is not optimal, but the two-stage process is optimal
         if params["D_total_opt"] == params["D_total"]:
             card = None
 

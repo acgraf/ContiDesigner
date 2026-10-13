@@ -12,11 +12,11 @@ tooltips = {
     "Yxs_1": "Biomass yield coefficient: grams of cells produced per gram of substrate consumed",
     "Yps_1": "Product yield coefficient: grams of product per gram of substrate consumed",
     "Yas_1": "ATP yield coefficient: grams of ATP per grams of substrate consumed",
-    "m_1": "Maintenance coefficient: substrate consumption rate for non-growth-associated maintenance",
+    "rho_1": "Maintenance coefficient: substrate consumption rate for non-growth-associated maintenance",
     "Yxs_2": "Biomass yield coefficient: grams of cells produced per gram of substrate consumed",
     "Yps_2": "Product yield coefficient: grams of product per gram of substrate consumed",
     "Yas_2": "ATP yield coefficient: grams of ATP per grams of substrate consumed",
-    "m_2": "Maintenance coefficient: substrate consumption rate for non-growth-associated maintenance",
+    "rho_2": "Maintenance coefficient: substrate consumption rate for non-growth-associated maintenance",
     # --- Process parameters ---
     "V_total": "Total reactor volume for the one-stage process, also the combined volume of both stages",
     "sf1": "Feed substrate concentration entering the one-stage reactor / stage one reactor",
@@ -36,8 +36,8 @@ tooltips = {
     "P₂ ≥ P₂,min. Dilution rates and (ϕ, ν) regions where it is not reached "
     "are greyed out but can still be selected. Leave empty for no constraint.",
     # --- Results tooltips ---
-    "optimal_header": "The optimal cascade and the corresponding one-stage process",
-    "selected_header": "User selected process conditions. Either the optimal cascade at "
+    "optimal_header": "The optimal two-stage process and the corresponding one-stage process",
+    "selected_header": "User selected process conditions. Either the optimal two-stage process at "
     "the selected D (diamond) or a user selected point (triangle)",
     "substrate_feed": "Substrate concentration in the feed",
     "biomass_concentration": "Steady state biomass concentration",
@@ -45,8 +45,8 @@ tooltips = {
     "product_concentration": "Steady state product concentration",
     "productivity": "rate of product formation per unit volume.",
     "yield": "Amount of product per consumed substrate", 
-    "feed_rate": "Total feed flow rate; for cascade, individual stage flows.",
-    "volume": "Reactor volume; for cascade, individual stage volumes.",
-    "dilution_rate": "Dilution rate; for cascade, values for each individual stage.",
+    "feed_rate": "Total feed flow rate; for two-stage, individual stage flows.",
+    "volume": "Reactor volume; for two-stage, individual stage volumes.",
+    "dilution_rate": "Dilution rate; for two-stage, values for each individual stage.",
 
 }

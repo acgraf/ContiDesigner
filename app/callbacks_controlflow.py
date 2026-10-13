@@ -151,13 +151,13 @@ def register_callbacks_controlflow(app):
 
     @app.callback(
         Output("onestage_header", "children"),
-        Output("cascade_header", "children"),
+        Output("twostage_header", "children"),
         Input("shared_state", "data"),
         prevent_initial_call=True,
     )
     def update_header(shared_state):
         if not shared_state:
-            return "Time Evolution: Cascade Process"
+            return "Time Evolution: Two-Stage Process"
 
         D = shared_state.get("D_total")
         phi = shared_state.get("phi_sel")
@@ -166,10 +166,10 @@ def register_callbacks_controlflow(app):
             # no feasible process (minimum titer not reached)
             return "One-stage process", "Two-stage process"
         onestage_header = f"One-stage process (D= {D:.3f} /h)"
-        cascade_header = (
+        twostage_header = (
             f"Two-stage process (D= {D:.3f} /h, Φ = {phi:.2f}, ν= {ny:.2f})"
         )
-        return onestage_header, cascade_header
+        return onestage_header, twostage_header
 
     # this function needs a callback, so the params store
     # gets updated any time an input changes
@@ -204,11 +204,11 @@ def register_callbacks_controlflow(app):
             "Yxs_1": f("Yxs_1"),
             "Yps_1": f("Yps_1"),
             "Yas_1": f("Yas_1"),
-            "m_1": f("m_1"),
+            "rho_1": f("rho_1"),
             "Yxs_2": f("Yxs_2"),
             "Yps_2": f("Yps_2"),
             "Yas_2": f("Yas_2"),
-            "m_2": f("m_2"),
+            "rho_2": f("rho_2"),
             "pi0_s1": f("pi0_s1"),
             "pi1_s1": f("pi1_s1"),
             "pi0_s2": f("pi0_s2"),
