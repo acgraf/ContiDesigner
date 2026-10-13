@@ -17,7 +17,7 @@ model_0 = conti_model.ContiModel(params)
 solver_0 = conti_solver.Solver(model_0)
 plotter_0 = conti_plotter.Plotter(model_0, solver_0)
 
-df, D_opt, _ = solver_0.optimize_phi_ny_across_D(max_param="STY_cascade", secondary_param="STY_2")
+df, D_opt, _ = solver_0.optimize_phi_ny_across_D(max_param="STY_twostage", secondary_param="STY_2")
 
 model = conti_model.ContiModel({**params, "D_total": D_opt})
 solver = conti_solver.Solver(model)
@@ -32,15 +32,15 @@ df_contour = pd.DataFrame(df_cont)
 # %%
 fig_STY = plotter.plot_D_range(Data=df)
 
-# Find the cascade trace
-cascade_trace = next(
+# Find the two-stage process trace
+twostage_trace = next(
     tr for tr in fig_STY.data
     if tr.name == "STY (Two-stage)"
 )
 
 # Find the point closest to D_opt
-idx = np.argmin(np.abs(np.asarray(cascade_trace.x) - D_opt))
-y_opt = cascade_trace.y[idx]
+idx = np.argmin(np.abs(np.asarray(twostage_trace.x) - D_opt))
+y_opt = twostage_trace.y[idx]
 
 # Add the star
 fig_STY.add_trace(

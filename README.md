@@ -24,7 +24,7 @@ ContiDesigner can be used in three ways:
   Interactive exploration with your own implementations
 
 - **Hosted web tool**  
-  Available at: [https://chemnettools.anc.univie.ac.at/ContiDesigner/] (no installation required)
+  Available at: https://chemnettools.anc.univie.ac.at/ContiDesigner/ (no installation required)
 
 
 ## Features
@@ -78,36 +78,27 @@ The interface consists of:
 - Information panel
 ### Web app (hosted)
 
-Access the hosted version: [https://chemnettools.anc.univie.ac.at/ContiDesigner/]
+Access the hosted version: https://chemnettools.anc.univie.ac.at/ContiDesigner/
 
 This is the easiest way to explore the tool without setup.
 
-
 ## Project Structure
-``` text
-ContiDesigner/
-├── app/ # Dash application and UI logic
-│ ├── dash_app.py # Main app entry point
-│ ├── conti_reactions.py # Reaction definitions used for SBML export
-│ ├── export_sbml.py # SBML export functionality
-│ ├── layout/ # UI components
-│ └── assets/ # Static assets 
-│
-├── src/
-│ └── ContiDesigner/ # Core installable Python package
-│ ├── core/ # Models, solvers, equations
-│ ├── plot/ # Plotting utilities
-│ └── utils/ # Helper functions
-│
-├── case_studies/ # Reproducible examples
-│ ├── lactic_acid/ # Lactic acid system
-│ └── PHB/ # PHB system
+app/ Dash application and UI logic
+dash_app.py Main app entry point
+conti_reactions.py Reaction definitions (for the sbml export)
+export_sbml.py SBML export
+layout/ UI components
+assets/ Static assets
 
-├── paper/ # Plots for the paper (graphical abstract)
-│
-│
-└── README.md
-```
+src/ContiDesigner/ Core package (installable)
+core/ Models and solvers
+plot/ Plotting utilities
+utils/ Helpers
+
+case_studies/ Reproducible examples
+LA/ Lactic acid system
+PHB/ PHB system
+
 ## Typical Workflow
 
 1. Define process parameters:
@@ -131,19 +122,17 @@ ContiDesigner/
 - Stage 2: substrate demand is determined by maintenance, production, and optional growth  
 
 Process structure:
-- Two-stage cascade
+- Two-stage process: Stage 1 feeds into stage 2  
 - Separate feed streams possible for both stages  
 
 The equivalent one-stage process:
 - Same total volume  
-- Combined feed equivalent to Stage 2 input  
+- Combined feed rate equivalent to Stage 2 input  
 
 Key design variables:
 - Dilution rate
 - Volume split  
 - Feed split  
-
-
 
 ## License
 MIT - see `license`

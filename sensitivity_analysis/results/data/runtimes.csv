@@ -1,0 +1,8 @@
+task,tool,seconds,n_evaluations
+"PHB two-stage, continuous (D, phi, nu)",differential evolution on ContiDesigner closed form,27.93,47972.0
+"grid refinement level 1 (hD=0.02, h=0.04, global)",ContiDesigner closed form,2.03,6875.0
+"grid refinement level 2 (hD=0.01, h=0.02, global)",ContiDesigner closed form,16.79,57500.0
+"grid refinement level 3 (hD=0.005, h=0.01, global)",ContiDesigner closed form,131.89,450846.0
+"grid refinement level 4 (hD=0.0025, h=0.005, local)",ContiDesigner closed form,0.67,2197.0
+"grid refinement level 5 (hD=0.00125, h=0.0025, local)",ContiDesigner closed form,0.73,2197.0
+PHB continuous optimum vs sf2_max (6 values),differential evolution on ContiDesigner closed form,14.34,56248.0
