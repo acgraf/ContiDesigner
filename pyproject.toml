@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "contidesigner"
-version = "0.1.0"
+version = "1.0.0"
 description = "Steady-state modeling and design of multi-stage continuous bioprocesses"
 readme = "README.md"
 license = { file = "license" }
