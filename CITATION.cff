@@ -1,0 +1,13 @@
+cff-version: 1.2.0
+message: "If you use ContiDesigner, please cite it as below."
+title: ContiDesigner
+version: 0.1.0
+date-released: 2026-11-16
+license: MIT
+repository-code: "https://github.com/acgraf/ContiDesigner"
+url: "https://chemnettools.anc.univie.ac.at/ContiDesigner/"
+authors:
+  - family-names: Graf
+    given-names: Andrea Caroline
+    email: andrea.caroline.graf@univie.ac.at
+    affiliation: University of Vienna

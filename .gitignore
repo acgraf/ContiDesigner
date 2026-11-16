@@ -6,8 +6,11 @@ dash_cache/
 *test.csv
 *.vscode/
 pi_tests/*
-test*
+test.py
+test_*.csv
 .ipynb_checkpoints/
 *.egg-info/
 run_log_*.txt
 dash_jobs/
+build/
+dist/

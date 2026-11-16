@@ -73,6 +73,8 @@ Run the app:
 ```bash
 python -m app.dash_app
 ```
+Then open http://127.0.0.1:8051/ContiDesigner/ in your browser.
+
 The interface consists of:
 - Input panel (parameters)
 - Results panel (plots, tables, downloads)
@@ -142,6 +144,11 @@ Key design variables:
 - Dilution rate
 - Volume split  
 - Feed split  
+
+## Acknowledgements
+
+This project was funded in part by the Austrian Science Fund
+(FWF), grant DOI [10.55776/COE17](https://www.fwf.ac.at/en/research-radar/10.55776/COE17) - [Cluster of Excellence: Circular Bioengineering](https://circularbioengineering.at/).
 
 ## License
 MIT - see `license`

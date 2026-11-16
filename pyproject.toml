@@ -5,10 +5,18 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "contidesigner"
 version = "0.1.0"
+description = "Steady-state modeling and design of multi-stage continuous bioprocesses"
+readme = "README.md"
+license = { file = "license" }
+authors = [{ name = "Andrea Caroline Graf", email = "andrea.caroline.graf@univie.ac.at" }]
+
 dependencies = [
     "numpy",
     "pandas", 
-    "plotly",     # plotting belongs to model package
-    "scipy",       # solvers
-    #"contextlib",  # for context management in solvers
+    "plotly",     
+    "scipy",
 ]
+
+[project.urls]
+Repository = "https://github.com/acgraf/ContiDesigner"
+"Web app" = "https://chemnettools.anc.univie.ac.at/ContiDesigner/"
